@@ -15,7 +15,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Konfigurasi CORS yang benar untuk mengizinkan akses dari frontend Anda
 const allowedOrigins = [
     'http://localhost:5173',
-    'http://192.168.103.166:5173' // Ganti dengan IP Anda jika berubah
+    'http://192.168.103.166:5173', // Ganti dengan IP Anda jika berubah
+    'https://proyek-ukm.vercel.app'
 ];
 app.use(cors({
     origin: allowedOrigins
