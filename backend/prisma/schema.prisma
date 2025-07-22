@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Ukm {
+  id                Int       @id @default(autoincrement())
+  nama_usaha        String
+  nama_pemilik      String
+  alamat            String    @db.Text
+  kategori_usaha    String?
+  nomor_telepon     String?
+  modal_usaha       Float?
+  klasifikasi       String?   // <-- Kolom ini yang akan kita gunakan
+  latitude          Float?
+  longitude         Float?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  userId            Int
+  user              User      @relation(fields: [userId], references: [id])
+  tahun_berdiri     Int?
+  nomor_nib         String?
+  tanggal_nib       DateTime?
+  file_nib          String?
+  kondisi_usaha     String?
+  badan_hukum       String?
+  // PERBAIKAN: Kolom klasifikasi_omset dihapus
+  lingkungan_lokasi String?
+  foto_pemilik      String?
+  foto_tempat_usaha String?
+  website           String?
+  facebook          String?
+  instagram         String?
+}
+
+model User {
+  id             Int       @id @default(autoincrement())
+  name           String
+  email          String    @unique
+  password       String
+  role           String    @default("pelaku_usaha")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  ukm            Ukm[]
+  is_pns         Boolean?
+  nik            String?   @unique
+  nomor_kk       String?
+  tempat_lahir   String?
+  tanggal_lahir  DateTime?
+  npwp           String?
+  jenis_kelamin  String?
+  foto_ktp       String?
+  provinsi       String?
+  kabupaten      String?
+  kecamatan      String?
+  desa           String?
+  alamat_lengkap String?   @db.Text
+}
