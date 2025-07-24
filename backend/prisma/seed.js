@@ -7,23 +7,24 @@ async function main() {
   console.log('Memulai proses seeding...');
 
   // Menghapus semua data lama untuk menghindari duplikat
-  await prisma.ukm.deleteMany();
-  await prisma.user.deleteMany();
+  await prisma.ukm.deleteMany({});
+  await prisma.user.deleteMany({});
   console.log('Data lama berhasil dihapus.');
 
-  // 1. Membuat satu user contoh sebagai pemilik semua data
-  const hashedPassword = await bcrypt.hash('password123', 10);
+  // 1. Membuat satu user admin sebagai pemilik semua data
+  const hashedPassword = await bcrypt.hash('admin123', 10); // Password: admin123
   const adminUser = await prisma.user.create({
     data: {
       name: 'Admin Disperindagkop',
       email: 'admin@pekanbaru.go.id',
       password: hashedPassword,
       role: 'admin',
+      nik: '0000000000000000', // PERBAIKAN: Menambahkan NIK unik untuk admin
     },
   });
-  console.log(`User contoh berhasil dibuat dengan ID: ${adminUser.id}`);
+  console.log(`User admin berhasil dibuat dengan ID: ${adminUser.id}`);
 
-  // 2. Menyiapkan 30 data UKM contoh yang realistis
+  // 2. Menyiapkan data UKM contoh yang realistis
   const ukmData = [
     // 10 USAHA MIKRO
     { nama_usaha: 'Warung Kopi Bahagia', nama_pemilik: 'Budi Santoso', alamat: 'Jl. Merdeka No. 10, Pekanbaru', kategori_usaha: 'Kuliner', nomor_telepon: '081234567890', modal_usaha: 75000000, klasifikasi: 'Usaha Mikro', latitude: 0.5283, longitude: 101.4451 },
@@ -67,7 +68,7 @@ async function main() {
     await prisma.ukm.create({
       data: {
         ...data,
-        // Menggunakan 'connect' untuk menghubungkan ke user yang sudah ada
+        // Menghubungkan UKM ini dengan user admin yang telah dibuat
         user: {
           connect: {
             id: adminUser.id,

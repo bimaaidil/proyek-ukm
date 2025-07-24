@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Form, Button, Container, Row, Col, Card, Alert } from 'react-bootstrap';
-import MapPicker from './MapPicker'; // PERBAIKAN: Impor komponen peta
+import { Form, Button, Container, Row, Col, Card } from 'react-bootstrap';
+import MapPicker from './MapPicker'; // Pastikan komponen ini ada
 // Data wilayah Riau lengkap (tetap sama)
 const dataWilayah = {
     "BENGKALIS": {
@@ -198,14 +198,14 @@ const dataWilayah = {
     }
 };
 
-function RegisterPage() {
+// PERBAIKAN: Terima props showSuccessToast dan showErrorToast
+function RegisterPage({ showSuccessToast, showErrorToast }) {
     const [formData, setFormData] = useState({ 
         provinsi: "RIAU",
-        latitude: '',  // State untuk menyimpan latitude
-        longitude: '' // State untuk menyimpan longitude
+        latitude: '',
+        longitude: ''
     });
     const [files, setFiles] = useState({});
-    const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const [kabupatenList] = useState(Object.keys(dataWilayah));
@@ -217,22 +217,22 @@ function RegisterPage() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
     
-    // PERBAIKAN: Handler baru untuk menerima koordinat dari peta
     const handleLocationSelect = (coords) => {
         setFormData(prev => ({
             ...prev,
-            latitude: coords.lat.toFixed(6), // Ambil latitude dengan 6 angka desimal
-            longitude: coords.lng.toFixed(6) // Ambil longitude dengan 6 angka desimal
+            latitude: coords.lat.toFixed(6),
+            longitude: coords.lng.toFixed(6)
         }));
     };
     
-     const handleKabupatenChange = (e) => {
+    const handleKabupatenChange = (e) => {
         const kab = e.target.value;
         handleChange(e);
         if (kab && dataWilayah[kab]) { setKecamatanList(Object.keys(dataWilayah[kab])); } else { setKecamatanList([]); }
         setDesaList([]);
         setFormData(prev => ({ ...prev, kecamatan: '', desa: '' }));
     };
+
     const handleKecamatanChange = (e) => {
         const kec = e.target.value;
         handleChange(e);
@@ -240,25 +240,37 @@ function RegisterPage() {
         if (kab && kec && dataWilayah[kab][kec]) { setDesaList(dataWilayah[kab][kec]); } else { setDesaList([]); }
         setFormData(prev => ({ ...prev, desa: '' }));
     };
+
     const handleFileChange = (e) => {
         setFiles(prev => ({ ...prev, [e.target.name]: e.target.files[0] }));
     };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
+        
         const data = new FormData();
         for (const key in formData) { data.append(key, formData[key]); }
         for (const key in files) { if (files[key]) { data.append(key, files[key]); } }
-         // TAMBAHKAN INI untuk melihat data yang akan dikirim
-    console.log("Data yang akan dikirim ke backend:", Object.fromEntries(data.entries()));
+        
+        console.log("Data yang akan dikirim ke backend:", Object.fromEntries(data.entries()));
+
         try {
             await axios.post('http://192.168.103.166:5000/api/register', data, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-            alert('Registrasi dan Pendaftaran Usaha berhasil! Silakan login.');
-            navigate('/login');
+            
+            // PERBAIKAN: Gunakan fungsi dari props
+            showSuccessToast("Pendaftaran berhasil! Anda akan diarahkan ke halaman login.");
+            
+            setTimeout(() => {
+                navigate('/login');
+            }, 4000); // Beri jeda 4 detik agar notifikasi terbaca
+
         } catch (err) {
-            setError(err.response?.data?.message || 'Registrasi gagal. Periksa kembali data Anda.');
+            const errorMessage = err.response?.data?.message || 'Registrasi gagal. Periksa kembali data Anda.';
+            
+            // PERBAIKAN: Gunakan fungsi dari props
+             showErrorToast(errorMessage);
         }
     };
 
@@ -269,7 +281,7 @@ function RegisterPage() {
                     <Card>
                         <Card.Header as="h4">Form Registrasi Pelaku & Brand Usaha</Card.Header>
                         <Card.Body>
-                            {error && <Alert variant="danger">{error}</Alert>}
+                            {/* Kita tidak lagi memerlukan <Alert> di sini */}
                             <Form onSubmit={handleSubmit}>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Apakah anda berprofesi sebagai PNS/TNI/POLRI/PEGAWAI BUMN/BUMD?</Form.Label>
