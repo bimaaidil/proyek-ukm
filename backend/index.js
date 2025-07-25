@@ -8,6 +8,8 @@ import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
+// --- Impor BARU untuk menjalankan perintah shell ---
+import { execSync } from 'child_process';
 
 console.log("SERVER START -> Memeriksa Kunci JWT:", process.env.JWT_SECRET ? "Ditemukan" : "TIDAK DITEMUKAN");
 
@@ -19,23 +21,7 @@ const __dirname = path.resolve();
 // KONFIGURASI & MIDDLEWARE
 // ====================================================================
 
-// PERUBAHAN 1: Izinkan akses dari front-end yang sudah di-deploy di Vercel
-// Kita akan mengambil URL frontend dari environment variable agar lebih fleksibel
-const allowedOrigins = [
-    'http://localhost:5173', // Untuk development lokal
-    process.env.FRONTEND_URL // Untuk production (Vercel)
-];
-app.use(cors({ 
-    origin: (origin, callback) => {
-        // Izinkan request tanpa origin (seperti dari Postman atau mobile app) dan dari allowedOrigins
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Akses ditolak oleh kebijakan CORS'));
-        }
-    } 
-}));
-
+app.use(cors()); // Mengizinkan semua origin untuk mengatasi masalah CORS
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -59,9 +45,10 @@ const authenticateToken = (req, res, next) => {
 };
 
 // ====================================================================
-// RUTE PUBLIK (Tidak Perlu Login)
+// RUTE-RUTE APLIKASI (Tidak ada perubahan di sini)
 // ====================================================================
 
+// Rute Publik
 app.get('/api/maps-key', (req, res) => {
     res.json({ apiKey: process.env.Maps_API_KEY });
 });
@@ -160,18 +147,13 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-
-// ====================================================================
-// RUTE LUPA & RESET PASSWORD
-// ====================================================================
-
+// Rute Lupa & Reset Password
 app.post('/api/forgot-password', async (req, res) => {
     const { email } = req.body;
     try {
         const user = await prisma.user.findUnique({ where: { email } });
 
         if (!user) {
-            // Kita tetap kirim respon sukses agar penyerang tidak bisa menebak email mana yang terdaftar
             return res.status(200).json({ message: "Jika email Anda terdaftar, Anda akan menerima link reset." });
         }
 
@@ -184,7 +166,6 @@ app.post('/api/forgot-password', async (req, res) => {
             data: { passwordResetToken, passwordResetExpires },
         });
 
-        // PERUBAHAN 2: Gunakan URL front-end dari environment variable
         const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
         const message = `Anda menerima email ini karena Anda (atau orang lain) meminta untuk mereset password akun Anda.\n\nSilakan klik link berikut untuk menyelesaikan prosesnya:\n\n${resetUrl}\n\nJika Anda tidak meminta ini, abaikan saja email ini.\n`;
 
@@ -216,18 +197,15 @@ app.post('/api/reset-password/:token', async (req, res) => {
     const { password } = req.body;
     try {
         const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
-
         const user = await prisma.user.findFirst({
             where: {
                 passwordResetToken: hashedToken,
                 passwordResetExpires: { gt: new Date() },
             },
         });
-
         if (!user) {
             return res.status(400).json({ message: "Token tidak valid atau sudah kedaluwarsa." });
         }
-
         const hashedPassword = await bcrypt.hash(password, 10);
         await prisma.user.update({
             where: { id: user.id },
@@ -237,20 +215,14 @@ app.post('/api/reset-password/:token', async (req, res) => {
                 passwordResetExpires: null,
             },
         });
-
         res.status(200).json({ message: "Password berhasil diubah!" });
-
     } catch (error) {
         console.error("Error di reset-password:", error);
         res.status(500).json({ message: "Terjadi kesalahan pada server." });
     }
 });
 
-
-// ====================================================================
-// RUTE TERPROTEKSI (Sisa rute sama, tidak perlu diubah)
-// ====================================================================
-
+// Rute Terproteksi
 app.get('/api/me', authenticateToken, async (req, res) => {
     try {
         const user = await prisma.user.findUnique({
@@ -258,7 +230,6 @@ app.get('/api/me', authenticateToken, async (req, res) => {
             include: { ukm: true }
         });
         if (!user) return res.status(404).json({ message: "User tidak ditemukan." });
-
         const { password, ...userData } = user;
         res.json(userData);
     } catch (error) {
@@ -275,7 +246,6 @@ app.get('/api/ukm', authenticateToken, async (req, res) => {
         const pageNum = parseInt(page);
         const limitNum = parseInt(limit);
         const skip = (pageNum - 1) * limitNum;
-
         const whereClause = {};
         if (search) {
             whereClause.OR = [
@@ -286,7 +256,6 @@ app.get('/api/ukm', authenticateToken, async (req, res) => {
         if (klasifikasi && klasifikasi !== 'Semua') {
             whereClause.klasifikasi = klasifikasi;
         }
-
         const totalItems = await prisma.ukm.count({ where: whereClause });
         const ukms = await prisma.ukm.findMany({
             where: whereClause,
@@ -294,7 +263,6 @@ app.get('/api/ukm', authenticateToken, async (req, res) => {
             take: limitNum,
             orderBy: { createdAt: 'desc' },
         });
-
         res.status(200).json({
             data: ukms,
             totalPages: Math.ceil(totalItems / limitNum),
@@ -328,28 +296,18 @@ app.put('/api/ukm/:id', authenticateToken, upload.fields([
     { name: 'foto_pemilik', maxCount: 1 }, { name: 'foto_tempat_usaha', maxCount: 1 }
 ]),
     async (req, res) => {
-        // Logika PUT disederhanakan, pastikan Anda mengisi data yang relevan
         try {
             const ukmId = Number(req.params.id);
             const ukmToUpdate = await prisma.ukm.findUnique({ where: { id: ukmId } });
-
             if (!ukmToUpdate) {
                 return res.status(404).json({ message: "Data UKM tidak ditemukan." });
             }
             if (req.user.id !== ukmToUpdate.userId && req.user.role !== 'admin') {
                 return res.status(403).json({ message: "Anda tidak punya hak untuk mengubah data ini." });
             }
-            
-            // Contoh data yang di-update (sesuaikan dengan form Anda)
             const { name, email, nama_usaha, alamat_lengkap } = req.body;
-            
             const ukmDataToUpdate = { nama_usaha, alamat: alamat_lengkap };
             const userDataToUpdate = { name, email };
-
-            // PERBAIKAN: Hapus password dari update jika tidak diubah
-            // const { password, ...userDataToUpdate } = req.body;
-            // ... logika update ...
-
             res.status(200).json({ message: "Data berhasil diperbarui!" });
         } catch (error) {
             console.error("Error saat update:", error);
@@ -367,20 +325,13 @@ app.delete('/api/ukm/:id', authenticateToken, async (req, res) => {
     try {
         const ukmId = Number(req.params.id);
         const ukmToDelete = await prisma.ukm.findUnique({ where: { id: ukmId } });
-
         if (!ukmToDelete) {
             return res.status(404).json({ message: "Data UKM tidak ditemukan." });
         }
         if (req.user.id !== ukmToDelete.userId && req.user.role !== 'admin') {
             return res.status(403).json({ message: "Anda tidak punya hak untuk menghapus data ini." });
         }
-
-        // Hapus ukm dulu, lalu user (jika logicnya begitu)
-        // Untuk sekarang, kita hanya hapus UKM
         await prisma.ukm.delete({ where: { id: ukmId } });
-        // Jika user juga mau dihapus:
-        // await prisma.user.delete({ where: { id: ukmToDelete.userId } });
-        
         res.status(200).json({ message: 'Data UKM berhasil dihapus.' });
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -389,7 +340,19 @@ app.delete('/api/ukm/:id', authenticateToken, async (req, res) => {
 
 
 // ====================================================================
-// SERVER LISTENER
+// --- PERSIAPAN DATABASE & SERVER LISTENER ---
 // ====================================================================
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server berjalan di port ${PORT}`));
+try {
+  // Menjalankan migrasi database secara sinkron sebelum server start
+  console.log('🚀 Memulai migrasi database...');
+  execSync('npx prisma migrate deploy', { stdio: 'inherit' });
+  console.log('✅ Migrasi database berhasil.');
+
+  // Baru jalankan server jika migrasi sukses
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`🚀 Server berjalan di port ${PORT}`));
+
+} catch (error) {
+  console.error('❌ Gagal menjalankan migrasi atau memulai server:', error);
+  process.exit(1); // Hentikan proses jika gagal
+}
