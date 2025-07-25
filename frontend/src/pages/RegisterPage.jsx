@@ -3,7 +3,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Container, Row, Col, Card } from 'react-bootstrap';
 import MapPicker from './MapPicker'; // Pastikan komponen ini ada
-// Data wilayah Riau lengkap (tetap sama)
+
+// Data wilayah Riau lengkap
 const dataWilayah = {
     "BENGKALIS": {
         "Bantan": ["Bantan Air", "Bantan Sari", "Bantan Tengah", "Bantan Timur", "Bantan Tua", "Berancah", "Deluk", "Jangkang", "Kembung Baru", "Kembung Luar", "Mentayan", "Muntai", "Muntai Barat", "Pampang Baru", "Pampang Pesisir", "Pasiran", "Resam Lapis", "Selat Baru", "Sukamaju", "Teluk Lancar", "Teluk Pambang", "Teluk Papal", "Ulu Pulau"],
@@ -198,12 +199,12 @@ const dataWilayah = {
     }
 };
 
-// PERBAIKAN: Terima props showSuccessToast dan showErrorToast
 function RegisterPage({ showSuccessToast, showErrorToast }) {
-    const [formData, setFormData] = useState({ 
+    const [formData, setFormData] = useState({
         provinsi: "RIAU",
         latitude: '',
         longitude: ''
+        // Tambahkan state awal lainnya jika perlu
     });
     const [files, setFiles] = useState({});
     const navigate = useNavigate();
@@ -216,7 +217,7 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
-    
+
     const handleLocationSelect = (coords) => {
         setFormData(prev => ({
             ...prev,
@@ -224,11 +225,15 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
             longitude: coords.lng.toFixed(6)
         }));
     };
-    
+
     const handleKabupatenChange = (e) => {
         const kab = e.target.value;
         handleChange(e);
-        if (kab && dataWilayah[kab]) { setKecamatanList(Object.keys(dataWilayah[kab])); } else { setKecamatanList([]); }
+        if (kab && dataWilayah[kab]) {
+            setKecamatanList(Object.keys(dataWilayah[kab]));
+        } else {
+            setKecamatanList([]);
+        }
         setDesaList([]);
         setFormData(prev => ({ ...prev, kecamatan: '', desa: '' }));
     };
@@ -237,7 +242,11 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
         const kec = e.target.value;
         handleChange(e);
         const kab = formData.kabupaten;
-        if (kab && kec && dataWilayah[kab][kec]) { setDesaList(dataWilayah[kab][kec]); } else { setDesaList([]); }
+        if (kab && kec && dataWilayah[kab] && dataWilayah[kab][kec]) {
+            setDesaList(dataWilayah[kab][kec]);
+        } else {
+            setDesaList([]);
+        }
         setFormData(prev => ({ ...prev, desa: '' }));
     };
 
@@ -247,30 +256,34 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         const data = new FormData();
-        for (const key in formData) { data.append(key, formData[key]); }
-        for (const key in files) { if (files[key]) { data.append(key, files[key]); } }
-        
+        for (const key in formData) {
+            data.append(key, formData[key]);
+        }
+        for (const key in files) {
+            if (files[key]) {
+                data.append(key, files[key]);
+            }
+        }
+
         console.log("Data yang akan dikirim ke backend:", Object.fromEntries(data.entries()));
 
         try {
-            await axios.post('http://192.168.103.166:5000/api/register', data, {
+            // PERBAIKAN: Menggunakan URL dari environment variable
+            await axios.post(`${process.env.REACT_APP_API_URL}/register`, data, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             
-            // PERBAIKAN: Gunakan fungsi dari props
             showSuccessToast("Pendaftaran berhasil! Anda akan diarahkan ke halaman login.");
             
             setTimeout(() => {
                 navigate('/login');
-            }, 4000); // Beri jeda 4 detik agar notifikasi terbaca
+            }, 4000);
 
         } catch (err) {
             const errorMessage = err.response?.data?.message || 'Registrasi gagal. Periksa kembali data Anda.';
-            
-            // PERBAIKAN: Gunakan fungsi dari props
-             showErrorToast(errorMessage);
+            showErrorToast(errorMessage);
         }
     };
 
@@ -281,7 +294,6 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
                     <Card>
                         <Card.Header as="h4">Form Registrasi Pelaku & Brand Usaha</Card.Header>
                         <Card.Body>
-                            {/* Kita tidak lagi memerlukan <Alert> di sini */}
                             <Form onSubmit={handleSubmit}>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Apakah anda berprofesi sebagai PNS/TNI/POLRI/PEGAWAI BUMN/BUMD?</Form.Label>
@@ -290,7 +302,7 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
                                         <Form.Check inline type="radio" label="Tidak" name="is_pns" value="false" onChange={handleChange} />
                                     </Col>
                                 </Form.Group>
-                                <hr/>
+                                <hr />
                                 <p className="fw-bold">DATA DIRI</p>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Nomor Induk Kependudukan (NIK)</Form.Label>
@@ -324,7 +336,7 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
                                     <Form.Label column sm={4}>Foto KTP</Form.Label>
                                     <Col sm={8}><Form.Control type="file" name="foto_ktp" onChange={handleFileChange} required /></Col>
                                 </Form.Group>
-                                <hr/>
+                                <hr />
                                 <p className="fw-bold">ALAMAT PELAKU USAHA (Sesuai Domisili)</p>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Provinsi</Form.Label>
@@ -339,7 +351,7 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
                                         </Form.Select>
                                     </Col>
                                 </Form.Group>
-                                 <Form.Group as={Row} className="mb-3">
+                                <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Kecamatan</Form.Label>
                                     <Col sm={8}>
                                         <Form.Select name="kecamatan" onChange={handleKecamatanChange} required disabled={kecamatanList.length === 0}>
@@ -357,25 +369,22 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
                                         </Form.Select>
                                     </Col>
                                 </Form.Group>
-                                 <Form.Group as={Row} className="mb-3">
+                                <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Alamat Lengkap</Form.Label>
                                     <Col sm={8}><Form.Control as="textarea" rows={3} name="alamat_lengkap" onChange={handleChange} required /></Col>
                                 </Form.Group>
-                                <hr/>
-                                
+                                <hr />
                                 <p className="fw-bold">DATA BRAND USAHA</p>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Nama atau Brand Usaha</Form.Label><Col sm={8}><Form.Control type="text" name="nama_usaha" onChange={handleChange} required /></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Tahun Berdiri</Form.Label><Col sm={8}><Form.Control type="number" name="tahun_berdiri" onChange={handleChange} /></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Nomor Izin Berusaha (NIB)</Form.Label><Col sm={8}><Form.Control type="text" name="nomor_nib" onChange={handleChange} /></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Tanggal Terbit NIB</Form.Label><Col sm={8}><Form.Control type="date" name="tanggal_nib" onChange={handleChange} /></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Upload File NIB/SKDU</Form.Label><Col sm={8}><Form.Control type="file" name="file_nib" onChange={handleFileChange} /></Col></Form.Group>
-                                <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Kondisi Usaha</Form.Label><Col sm={8}><Form.Check inline type="radio" label="Masih Berjalan" name="kondisi_usaha" value="Masih Berjalan" onChange={handleChange} /><Form.Check inline type="radio" label="Sudah Tutup" name="kondisi_usaha" value="Sudah Tutup" onChange={handleChange} /></Col></Form.Group>
+                                <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Kondisi Usaha</Form.Label><Col sm={8}><Form.Check inline type="radio" name="kondisi_usaha" value="Masih Berjalan" onChange={handleChange} /><Form.Check inline type="radio" name="kondisi_usaha" value="Sudah Tutup" onChange={handleChange} /></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Nomor Telepon/HP Usaha</Form.Label>
                                     <Col sm={8}><Form.Control type="text" name="nomor_telepon" onChange={handleChange} required /></Col>
                                 </Form.Group>
-
-                                {/* PERBAIKAN: Ganti input manual dengan peta interaktif */}
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={12}>
                                         Pilih Lokasi Usaha di Peta (Klik pada Peta)
@@ -383,7 +392,6 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
                                     <Col sm={12}>
                                         <MapPicker onLocationChange={handleLocationSelect} />
                                     </Col>
-                                    {/* Input disabled ini hanya untuk menampilkan koordinat yang terpilih */}
                                     <Col sm={6} className="mt-2">
                                         <Form.Control type="text" name="latitude" placeholder="Latitude" value={formData.latitude} readOnly disabled />
                                     </Col>
@@ -391,12 +399,9 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
                                         <Form.Control type="text" name="longitude" placeholder="Longitude" value={formData.longitude} readOnly disabled />
                                     </Col>
                                 </Form.Group>
-                                <hr/>
-
-                                 <p className="fw-bold">LEGALITAS & KLASIFIKASI USAHA</p>
+                                <hr />
+                                <p className="fw-bold">LEGALITAS & KLASIFIKASI USAHA</p>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Badan Hukum/Legalitas</Form.Label><Col sm={8}><Form.Check type="radio" name="badan_hukum" label="Belum Ada" value="Belum Ada" onChange={handleChange} /><Form.Check type="radio" name="badan_hukum" label="Perseorangan" value="Perseorangan" onChange={handleChange} /></Col></Form.Group>
-                                
-                                {/* PERBAIKAN: Mengganti 'name' menjadi 'klasifikasi' */}
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Klasifikasi Usaha (Omset)</Form.Label>
                                     <Col sm={8}>
@@ -405,20 +410,19 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
                                         <Form.Check type="radio" name="klasifikasi" label="Menengah (2,5 Miliar - 50 Miliar/Tahun)" value="Usaha Menengah" onChange={handleChange} />
                                     </Col>
                                 </Form.Group>
+                                <hr />
                                 <p className="fw-bold">INFORMASI TAMBAHAN</p>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Lingkungan Lokasi Usaha</Form.Label><Col sm={8}><Form.Check type="radio" name="lingkungan_lokasi" label="Dalam Pemukiman/Perumahan" value="Pemukiman" onChange={handleChange} /><Form.Check type="radio" name="lingkungan_lokasi" label="Dalam Pasar/Pusat Perbelanjaan/Mall" value="Pusat Perbelanjaan" onChange={handleChange} /><Form.Check type="radio" name="lingkungan_lokasi" label="Dalam Ruko/Rukan" value="Ruko" onChange={handleChange} /></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Foto Pemilik Usaha</Form.Label><Col sm={8}><Form.Control type="file" name="foto_pemilik" onChange={handleFileChange} /></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Foto Tempat Usaha</Form.Label><Col sm={8}><Form.Control type="file" name="foto_tempat_usaha" onChange={handleFileChange} /></Col></Form.Group>
-
-                                <hr/>
+                                <hr />
                                 <p className="fw-bold">DATA AKUN & KONTAK</p>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Alamat Email</Form.Label><Col sm={8}><Form.Control type="email" name="email" onChange={handleChange} required /></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Password</Form.Label><Col sm={8}><Form.Control type="password" name="password" onChange={handleChange} required /></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Alamat Website</Form.Label><Col sm={8}><Form.Control type="text" name="website" onChange={handleChange} /></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Akun Facebook</Form.Label><Col sm={8}><Form.Control type="text" name="facebook" onChange={handleChange} /></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Akun Instagram</Form.Label><Col sm={8}><Form.Control type="text" name="instagram" onChange={handleChange} /></Col></Form.Group>
-                                
-                                 <div className="d-grid mt-4">
+                                <div className="d-grid mt-4">
                                     <Button variant="primary" type="submit">Kirim Data</Button>
                                 </div>
                             </Form>
