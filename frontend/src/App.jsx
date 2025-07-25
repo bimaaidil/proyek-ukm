@@ -27,10 +27,8 @@ import LoginPage from './pages/LoginPage';
 import UkmList from './pages/UkmList';
 import UkmEdit from './pages/UkmEdit';
 import ProfilePage from './pages/ProfilePage';
-// --- TAMBAHKAN IMPOR DI BAWAH INI ---
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
-
 
 // ====================================================================
 // FUNGSI NOTIFIKASI KUSTOM (TERPUSAT)
@@ -66,12 +64,17 @@ const showInfoToast = (message) => {
   );
 };
 
-
 // ====================================================================
 // KOMPONEN UTAMA APLIKASI
 // ====================================================================
 
 function App() {
+  // ▼▼▼ KODE DIAGNOSTIK DITAMBAHKAN DI SINI ▼▼▼
+  // Baris ini akan mencetak nilai VITE_API_URL ke konsol browser
+  // untuk memastikan variabelnya terbaca dengan benar di Vercel.
+  console.log("HASIL TES VARIABEL API_URL:", import.meta.env.VITE_API_URL);
+  // ▲▲▲ AKHIR DARI KODE DIAGNOSTIK ▲▲▲
+
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -176,9 +179,9 @@ function App() {
           {/* Rute Publik */}
           <Route path="/" element={<WelcomePage />} />
           <Route path="/register" element={<RegisterPage showSuccessToast={showSuccessToast} showErrorToast={showErrorToast} />} />
-          <Route path="/login" element={<LoginPage setUser={setUser} showSuccessToast={showSuccessToast} showErrorToast={showErrorToast}/>} />
+          <Route path="/login" element={<LoginPage setUser={setUser} showSuccessToast={showSuccessToast} showErrorToast={showErrorToast} />} />
           
-          {/* --- TAMBAHKAN DUA RUTE DI BAWAH INI --- */}
+          {/* --- Rute Lupa & Reset Password --- */}
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
