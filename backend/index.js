@@ -8,8 +8,6 @@ import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
-// --- Impor BARU untuk menjalankan perintah shell ---
-import { execSync } from 'child_process';
 
 console.log("SERVER START -> Memeriksa Kunci JWT:", process.env.JWT_SECRET ? "Ditemukan" : "TIDAK DITEMUKAN");
 
@@ -342,17 +340,7 @@ app.delete('/api/ukm/:id', authenticateToken, async (req, res) => {
 // ====================================================================
 // --- PERSIAPAN DATABASE & SERVER LISTENER ---
 // ====================================================================
-try {
-  // Menjalankan migrasi database secara sinkron sebelum server start
-  console.log('🚀 Memulai migrasi database...');
-  execSync('npx prisma migrate deploy', { stdio: 'inherit' });
-  console.log('✅ Migrasi database berhasil.');
 
   // Baru jalankan server jika migrasi sukses
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => console.log(`🚀 Server berjalan di port ${PORT}`));
-
-} catch (error) {
-  console.error('❌ Gagal menjalankan migrasi atau memulai server:', error);
-  process.exit(1); // Hentikan proses jika gagal
-}
