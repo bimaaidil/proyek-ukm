@@ -89,8 +89,6 @@ function ProfilePage() {
                                 <Card.Body className="p-4">
                                     <h5 className="fw-bold mb-3 d-flex align-items-center"><Building size={20} className="me-2 text-primary"/> Tentang Usaha</h5>
                                     <p className="text-muted">
-                                        Deskripsi singkat tentang usaha Anda bisa diletakkan di sini. Menjelaskan produk unggulan,
-                                        visi, atau cerita di balik usaha Anda untuk menarik pelanggan.
                                     </p>
                                     <hr />
                                     <Row>
