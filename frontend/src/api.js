@@ -1,8 +1,12 @@
 import axios from 'axios';
 
+// Ambil URL API dari environment variable yang sudah Anda atur di Vercel.
+// Jika tidak ada (saat development di laptop), gunakan alamat localhost sebagai cadangan.
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 // Membuat instance axios yang sudah dikonfigurasi
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL, // Mengambil URL dasar API dari file .env
+  baseURL: API_URL,
 });
 
 // "Interceptor" ini akan berjalan pada setiap permintaan sebelum dikirim
