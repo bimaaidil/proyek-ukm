@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import multer from 'multer';
 import path from 'path';
@@ -8,8 +8,6 @@ import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
-
-console.log("SERVER START -> Memeriksa Kunci JWT:", process.env.JWT_SECRET ? "Ditemukan" : "TIDAK DITEMUKAN");
 
 const app = express();
 const prisma = new PrismaClient();
@@ -19,7 +17,11 @@ const __dirname = path.resolve();
 // KONFIGURASI & MIDDLEWARE
 // ====================================================================
 
-app.use(cors()); // Mengizinkan semua origin untuk mengatasi masalah CORS
+// --- PERBAIKAN FINAL CORS ---
+// Kode ini akan mengizinkan SEMUA permintaan dari luar.
+// Ini adalah cara paling pasti untuk menyelesaikan error CORS.
+app.use(cors());
+
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -32,7 +34,6 @@ const upload = multer({ storage: storage });
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
-
     if (token == null) return res.sendStatus(401);
 
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
@@ -51,70 +52,70 @@ app.get('/api/maps-key', (req, res) => {
     res.json({ apiKey: process.env.Maps_API_KEY });
 });
 
-app.post(
-    '/api/register',
+app.post('/api/register',
     upload.fields([
-        { name: 'foto_ktp', maxCount: 1 },
-        { name: 'file_nib', maxCount: 1 },
-        { name: 'foto_pemilik', maxCount: 1 },
-        { name: 'foto_tempat_usaha', maxCount: 1 },
+        { name: 'foto_ktp', maxCount: 1 }, { name: 'file_nib', maxCount: 1 },
+        { name: 'foto_pemilik', maxCount: 1 }, { name: 'foto_tempat_usaha', maxCount: 1 },
     ]),
     async (req, res) => {
-        const {
-            name, nik, email, password, nomor_kk, tempat_lahir, tanggal_lahir,
-            jenis_kelamin, npwp, is_pns, provinsi, kabupaten, kecamatan, desa,
-            alamat_lengkap, nama_usaha, tahun_berdiri, nomor_nib, tanggal_nib,
-            kondisi_usaha, kategori_usaha, nomor_telepon, modal_usaha, badan_hukum,
-            klasifikasi, lingkungan_lokasi, website, facebook, instagram,
-            latitude, longitude
-        } = req.body;
-
         try {
+            const { name, nik, email, password, /* ...dan field lainnya */ } = req.body;
             const existingUser = await prisma.user.findFirst({
                 where: { OR: [{ email }, { nik }] }
             });
-
             if (existingUser) {
-                if (existingUser.email === email) {
-                    return res.status(409).json({ message: "Email sudah terdaftar." });
-                }
-                if (existingUser.nik === nik) {
-                    return res.status(409).json({ message: "NIK sudah terdaftar." });
-                }
+                return res.status(409).json({ message: "Email atau NIK sudah terdaftar." });
             }
-
             const hashedPassword = await bcrypt.hash(password, 10);
-
-            const newUser = await prisma.user.create({
+            
+            // Logika pembuatan user dan ukm
+            await prisma.user.create({
                 data: {
-                    name, nik, email, password: hashedPassword, nomor_kk, tempat_lahir,
-                    tanggal_lahir: tanggal_lahir ? new Date(tanggal_lahir) : null,
-                    jenis_kelamin, npwp: npwp || null, is_pns: is_pns === 'true',
-                    provinsi, kabupaten, kecamatan, desa, alamat_lengkap,
+                    // ...semua data dari req.body
+                    name: req.body.name,
+                    nik: req.body.nik,
+                    email: req.body.email,
+                    password: hashedPassword,
+                    nomor_kk: req.body.nomor_kk,
+                    tempat_lahir: req.body.tempat_lahir,
+                    tanggal_lahir: req.body.tanggal_lahir ? new Date(req.body.tanggal_lahir) : null,
+                    jenis_kelamin: req.body.jenis_kelamin,
+                    npwp: req.body.npwp || null,
+                    is_pns: req.body.is_pns === 'true',
+                    provinsi: req.body.provinsi,
+                    kabupaten: req.body.kabupaten,
+                    kecamatan: req.body.kecamatan,
+                    desa: req.body.desa,
+                    alamat_lengkap: req.body.alamat_lengkap,
                     foto_ktp: req.files?.foto_ktp?.[0]?.path || null,
                     ukm: {
                         create: {
-                            nama_usaha, nama_pemilik: name, alamat: alamat_lengkap, kategori_usaha, nomor_telepon,
-                            modal_usaha: modal_usaha ? parseFloat(modal_usaha) : null,
-                            tahun_berdiri: tahun_berdiri ? parseInt(tahun_berdiri) : null,
-                            nomor_nib, tanggal_nib: tanggal_nib ? new Date(tanggal_nib) : null,
-                            kondisi_usaha,
+                            nama_usaha: req.body.nama_usaha,
+                            nama_pemilik: req.body.name,
+                            alamat: req.body.alamat_lengkap,
+                            kategori_usaha: req.body.kategori_usaha,
+                            nomor_telepon: req.body.nomor_telepon,
+                            modal_usaha: req.body.modal_usaha ? parseFloat(req.body.modal_usaha) : null,
+                            tahun_berdiri: req.body.tahun_berdiri ? parseInt(req.body.tahun_berdiri) : null,
+                            nomor_nib: req.body.nomor_nib,
+                            tanggal_nib: req.body.tanggal_nib ? new Date(req.body.tanggal_nib) : null,
+                            kondisi_usaha: req.body.kondisi_usaha,
                             file_nib: req.files?.file_nib?.[0]?.path || null,
-                            badan_hukum, klasifikasi, lingkungan_lokasi, website, facebook, instagram,
+                            badan_hukum: req.body.badan_hukum,
+                            klasifikasi: req.body.klasifikasi,
+                            lingkungan_lokasi: req.body.lingkungan_lokasi,
+                            website: req.body.website,
+                            facebook: req.body.facebook,
+                            instagram: req.body.instagram,
                             foto_pemilik: req.files?.foto_pemilik?.[0]?.path || null,
                             foto_tempat_usaha: req.files?.foto_tempat_usaha?.[0]?.path || null,
-                            latitude: latitude ? parseFloat(latitude) : null,
-                            longitude: longitude ? parseFloat(longitude) : null,
+                            latitude: req.body.latitude ? parseFloat(req.body.latitude) : null,
+                            longitude: req.body.longitude ? parseFloat(req.body.longitude) : null,
                         }
                     }
                 }
             });
-
-            return res.status(201).json({
-                success: true,
-                message: "Registrasi berhasil!"
-            });
-
+            return res.status(201).json({ message: "Registrasi berhasil!" });
         } catch (error) {
             console.error("❌ Error saat registrasi:", error);
             return res.status(500).json({ message: "Terjadi kesalahan pada server." });
@@ -126,18 +127,19 @@ app.post('/api/login', async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await prisma.user.findUnique({ where: { email } });
-        if (!user) return res.status(401).json({ message: "Email atau password salah." });
-
+        if (!user) {
+            return res.status(401).json({ message: "Email atau password salah." });
+        }
         const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) return res.status(401).json({ message: "Email atau password salah." });
-
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: "Email atau password salah." });
+        }
         const { password: _, ...userData } = user;
         const token = jwt.sign(
             { id: user.id, name: user.name, role: user.role },
             process.env.JWT_SECRET,
             { expiresIn: '1d' }
         );
-
         res.status(200).json({ user: userData, token });
     } catch (error) {
         console.error("Error pada /api/login:", error);
