@@ -9,7 +9,7 @@
     "dev": "nodemon index.js",
     "build": "npx prisma generate",
     "prisma:migrate": "npx prisma migrate deploy",
-    "deploy": "npx prisma migrate deploy && node index.js"
+    "deploy": "sleep 5 && npx prisma migrate deploy && node index.js"
   },
   "keywords": [],
   "author": "",
