@@ -9,27 +9,47 @@ import 'dotenv/config';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 
+// Impor helper untuk upload ke cloud storage (misalnya Cloudinary)
+// Anda perlu menginstal package-nya: npm install cloudinary
+import { v2 as cloudinary } from 'cloudinary';
+
 const app = express();
 const prisma = new PrismaClient();
-const __dirname = path.resolve();
 
 // ====================================================================
 // KONFIGURASI & MIDDLEWARE
 // ====================================================================
 
-// --- PERBAIKAN FINAL CORS ---
-// Kode ini akan mengizinkan SEMUA permintaan dari luar.
-// Ini adalah cara paling pasti untuk menyelesaikan error CORS.
 app.use(cors());
-
 app.use(express.json());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => { cb(null, 'uploads/'); },
-    filename: (req, file, cb) => { cb(null, Date.now() + '-' + file.originalname); }
-});
+// --- PERUBAHAN 1: KONFIGURASI UPLOAD FILE UNTUK VERCEL ---
+// Vercel tidak punya sistem file permanen, jadi kita gunakan 'memoryStorage'
+// untuk memproses file di memori sebelum diunggah ke cloud.
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+
+// Konfigurasi Cloudinary (atau layanan lain seperti AWS S3)
+// Pastikan Anda sudah mengatur variabel ini di Environment Variables Vercel
+cloudinary.config({ 
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET 
+});
+
+// Helper function untuk upload stream ke Cloudinary
+const uploadToCloudinary = (fileBuffer) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { resource_type: "auto" },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+    uploadStream.end(fileBuffer);
+  });
+};
 
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -44,7 +64,7 @@ const authenticateToken = (req, res, next) => {
 };
 
 // ====================================================================
-// RUTE-RUTE APLIKASI (Tidak ada perubahan di sini)
+// RUTE-RUTE APLIKASI
 // ====================================================================
 
 // Rute Publik
@@ -59,19 +79,33 @@ app.post('/api/register',
     ]),
     async (req, res) => {
         try {
-            const { name, nik, email, password, /* ...dan field lainnya */ } = req.body;
+            const { name, nik, email, password } = req.body;
             const existingUser = await prisma.user.findFirst({
                 where: { OR: [{ email }, { nik }] }
             });
+
             if (existingUser) {
                 return res.status(409).json({ message: "Email atau NIK sudah terdaftar." });
             }
+
             const hashedPassword = await bcrypt.hash(password, 10);
             
-            // Logika pembuatan user dan ukm
+            // Proses upload semua file yang ada ke Cloudinary secara bersamaan
+            const fotoKtpFile = req.files?.foto_ktp?.[0];
+            const fileNibFile = req.files?.file_nib?.[0];
+            const fotoPemilikFile = req.files?.foto_pemilik?.[0];
+            const fotoTempatUsahaFile = req.files?.foto_tempat_usaha?.[0];
+
+            const [fotoKtpResult, fileNibResult, fotoPemilikResult, fotoTempatUsahaResult] = await Promise.all([
+                fotoKtpFile ? uploadToCloudinary(fotoKtpFile.buffer) : Promise.resolve(null),
+                fileNibFile ? uploadToCloudinary(fileNibFile.buffer) : Promise.resolve(null),
+                fotoPemilikFile ? uploadToCloudinary(fotoPemilikFile.buffer) : Promise.resolve(null),
+                fotoTempatUsahaFile ? uploadToCloudinary(fotoTempatUsahaFile.buffer) : Promise.resolve(null),
+            ]);
+
+            // Simpan URL dari Cloudinary ke database
             await prisma.user.create({
                 data: {
-                    // ...semua data dari req.body
                     name: req.body.name,
                     nik: req.body.nik,
                     email: req.body.email,
@@ -87,7 +121,7 @@ app.post('/api/register',
                     kecamatan: req.body.kecamatan,
                     desa: req.body.desa,
                     alamat_lengkap: req.body.alamat_lengkap,
-                    foto_ktp: req.files?.foto_ktp?.[0]?.path || null,
+                    foto_ktp: fotoKtpResult?.secure_url || null,
                     ukm: {
                         create: {
                             nama_usaha: req.body.nama_usaha,
@@ -100,15 +134,15 @@ app.post('/api/register',
                             nomor_nib: req.body.nomor_nib,
                             tanggal_nib: req.body.tanggal_nib ? new Date(req.body.tanggal_nib) : null,
                             kondisi_usaha: req.body.kondisi_usaha,
-                            file_nib: req.files?.file_nib?.[0]?.path || null,
+                            file_nib: fileNibResult?.secure_url || null,
                             badan_hukum: req.body.badan_hukum,
                             klasifikasi: req.body.klasifikasi,
                             lingkungan_lokasi: req.body.lingkungan_lokasi,
                             website: req.body.website,
                             facebook: req.body.facebook,
                             instagram: req.body.instagram,
-                            foto_pemilik: req.files?.foto_pemilik?.[0]?.path || null,
-                            foto_tempat_usaha: req.files?.foto_tempat_usaha?.[0]?.path || null,
+                            foto_pemilik: fotoPemilikResult?.secure_url || null,
+                            foto_tempat_usaha: fotoTempatUsahaResult?.secure_url || null,
                             latitude: req.body.latitude ? parseFloat(req.body.latitude) : null,
                             longitude: req.body.longitude ? parseFloat(req.body.longitude) : null,
                         }
@@ -147,7 +181,6 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// Rute Lupa & Reset Password
 app.post('/api/forgot-password', async (req, res) => {
     const { email } = req.body;
     try {
@@ -291,6 +324,8 @@ app.get('/api/ukm/:id', authenticateToken, async (req, res) => {
     }
 });
 
+// PENTING: Anda perlu menerapkan logika upload ke Cloudinary di rute PUT ini juga
+// jika Anda ingin mengizinkan pengguna mengubah file mereka.
 app.put('/api/ukm/:id', authenticateToken, upload.fields([
     { name: 'foto_ktp', maxCount: 1 }, { name: 'file_nib', maxCount: 1 },
     { name: 'foto_pemilik', maxCount: 1 }, { name: 'foto_tempat_usaha', maxCount: 1 }
@@ -305,9 +340,16 @@ app.put('/api/ukm/:id', authenticateToken, upload.fields([
             if (req.user.id !== ukmToUpdate.userId && req.user.role !== 'admin') {
                 return res.status(403).json({ message: "Anda tidak punya hak untuk mengubah data ini." });
             }
+            
+            // TODO: Tambahkan logika untuk mengunggah file baru ke Cloudinary
+            // dan menghapus file lama jika perlu.
+            
             const { name, email, nama_usaha, alamat_lengkap } = req.body;
             const ukmDataToUpdate = { nama_usaha, alamat: alamat_lengkap };
             const userDataToUpdate = { name, email };
+
+            // TODO: Update data di database dengan data baru, termasuk URL file baru
+            
             res.status(200).json({ message: "Data berhasil diperbarui!" });
         } catch (error) {
             console.error("Error saat update:", error);
@@ -331,6 +373,10 @@ app.delete('/api/ukm/:id', authenticateToken, async (req, res) => {
         if (req.user.id !== ukmToDelete.userId && req.user.role !== 'admin') {
             return res.status(403).json({ message: "Anda tidak punya hak untuk menghapus data ini." });
         }
+
+        // TODO: Tambahkan logika untuk menghapus file dari Cloudinary
+        // sebelum menghapus data dari database.
+        
         await prisma.ukm.delete({ where: { id: ukmId } });
         res.status(200).json({ message: 'Data UKM berhasil dihapus.' });
     } catch (error) {
@@ -338,11 +384,11 @@ app.delete('/api/ukm/:id', authenticateToken, async (req, res) => {
     }
 });
 
-
 // ====================================================================
-// --- PERSIAPAN DATABASE & SERVER LISTENER ---
+// --- PERSIAPAN UNTUK VERCEL ---
 // ====================================================================
 
-  // Baru jalankan server jika migrasi sukses
-  const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => console.log(`🚀 Server berjalan di port ${PORT}`));
+// Baris app.listen() DIHAPUS karena Vercel menanganinya secara otomatis.
+
+// Ekspor variabel 'app' agar Vercel bisa menggunakannya sebagai Serverless Function.
+export default app;
