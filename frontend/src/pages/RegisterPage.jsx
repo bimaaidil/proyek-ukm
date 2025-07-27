@@ -271,7 +271,7 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
 
         try {
             // PERBAIKAN: Menggunakan URL dari environment variable
-            await axios.post(`${import.meta.env.VITE_API_URL}/register`, data, {
+            await axios.post(`${import.meta.env.VITE_API_URL}/api/register`, data, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             
