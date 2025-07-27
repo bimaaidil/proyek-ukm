@@ -23,6 +23,11 @@ const prisma = new PrismaClient();
 app.use(cors());
 app.use(express.json());
 
+// Health Check Route untuk halaman utama
+app.get("/", (req, res) => {
+  res.send("Backend API Proyek UKM sedang berjalan!");
+});
+
 // --- PERUBAHAN 1: KONFIGURASI UPLOAD FILE UNTUK VERCEL ---
 // Vercel tidak punya sistem file permanen, jadi kita gunakan 'memoryStorage'
 // untuk memproses file di memori sebelum diunggah ke cloud.
