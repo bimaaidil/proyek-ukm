@@ -281,8 +281,9 @@ function UkmEdit() {
             toast.success('Data usaha berhasil diperbarui!');
             navigate('/dashboard');
         } catch (err) {
-            setError(err.response?.data?.message || 'Update gagal.');
-            toast.error(err.response?.data?.message || 'Update gagal.');
+            const errorMessage = err.response?.data?.message || 'Update gagal.';
+            setError(errorMessage);
+            toast.error(errorMessage);
         }
     };
 
@@ -300,6 +301,11 @@ function UkmEdit() {
                             {error && <Alert variant="danger">{error}</Alert>}
                             <Form onSubmit={handleSubmit}>
                                 
+                                {/* ======================================================= */}
+                                {/* --- TANDA KESALAHAN DAN PERBAIKAN DIMULAI DARI SINI --- */}
+                                {/* Setiap input ditambahkan 'value' atau 'checked' untuk menampilkan data */}
+                                {/* ======================================================= */}
+                                
                                 <p className="fw-bold">DATA DIRI</p>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Nama Pelaku Usaha</Form.Label>
@@ -315,26 +321,27 @@ function UkmEdit() {
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Tempat & Tanggal Lahir</Form.Label>
-                                    <Col sm={5}><Form.Control type="text" name="tempat_lahir" placeholder="Tempat Lahir" onChange={handleChange} required /></Col>
-                                    <Col sm={3}><Form.Control type="date" name="tanggal_lahir" onChange={handleChange} required /></Col>
-                                </Form.Group>
-                                <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm={4}>NPWP</Form.Label>
-                                    <Col sm={8}><Form.Control type="text" name="npwp" onChange={handleChange} /></Col>
+                                    <Col sm={5}><Form.Control type="text" name="tempat_lahir" placeholder="Tempat Lahir" value={formData.tempat_lahir || ''} onChange={handleChange} required /></Col>
+                                    <Col sm={3}><Form.Control type="date" name="tanggal_lahir" value={formData.tanggal_lahir || ''} onChange={handleChange} required /></Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Jenis Kelamin</Form.Label>
                                     <Col sm={8}>
-                                        <Form.Check inline type="radio" label="Laki-laki" name="jenis_kelamin" value="Laki-laki" onChange={handleChange} />
-                                        <Form.Check inline type="radio" label="Perempuan" name="jenis_kelamin" value="Perempuan" onChange={handleChange} />
+                                        <Form.Check inline type="radio" label="Laki-laki" name="jenis_kelamin" value="Laki-laki" checked={formData.jenis_kelamin === 'Laki-laki'} onChange={handleChange} />
+                                        <Form.Check inline type="radio" label="Perempuan" name="jenis_kelamin" value="Perempuan" checked={formData.jenis_kelamin === 'Perempuan'} onChange={handleChange} />
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Foto KTP</Form.Label>
-                                    <Col sm={8}><Form.Control type="file" name="foto_ktp" onChange={handleFileChange} required /></Col>
+                                    <Col sm={8}>
+                                        {formData.foto_ktp && <a href={formData.foto_ktp} target="_blank" rel="noopener noreferrer">Lihat Foto KTP Saat Ini</a>}
+                                        <Form.Control type="file" name="foto_ktp" onChange={handleFileChange} className="mt-2" />
+                                        <Form.Text className="text-muted">Upload file baru hanya jika ingin mengganti.</Form.Text>
+                                    </Col>
                                 </Form.Group>
+
                                 <hr/>
-<p className="fw-bold">ALAMAT PELAKU USAHA</p>
+                                <p className="fw-bold">ALAMAT PELAKU USAHA</p>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Kabupaten/Kota</Form.Label>
                                     <Col sm={8}>
@@ -362,22 +369,34 @@ function UkmEdit() {
                                         </Form.Select>
                                     </Col>
                                 </Form.Group>
-                                 <Form.Group as={Row} className="mb-3">
+                                <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Alamat Lengkap</Form.Label>
-                                    <Col sm={8}><Form.Control as="textarea" rows={3} name="alamat_lengkap" onChange={handleChange} required /></Col>
+                                    <Col sm={8}><Form.Control as="textarea" rows={3} name="alamat_lengkap" value={formData.alamat_lengkap || ''} onChange={handleChange} required /></Col>
                                 </Form.Group>
-                                <hr/>
                                 
+                                <hr/>
                                 <p className="fw-bold">DATA BRAND USAHA</p>
-                                <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Nama atau Brand Usaha</Form.Label><Col sm={8}><Form.Control type="text" name="nama_usaha" onChange={handleChange} required /></Col></Form.Group>
-                                <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Tahun Berdiri</Form.Label><Col sm={8}><Form.Control type="number" name="tahun_berdiri" onChange={handleChange} /></Col></Form.Group>
-                                <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Nomor Izin Berusaha (NIB)</Form.Label><Col sm={8}><Form.Control type="text" name="nomor_nib" onChange={handleChange} /></Col></Form.Group>
-                                <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Tanggal Terbit NIB</Form.Label><Col sm={8}><Form.Control type="date" name="tanggal_nib" onChange={handleChange} /></Col></Form.Group>
-                                <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Upload File NIB/SKDU</Form.Label><Col sm={8}><Form.Control type="file" name="file_nib" onChange={handleFileChange} /></Col></Form.Group>
-                                <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Kondisi Usaha</Form.Label><Col sm={8}><Form.Check inline type="radio" label="Masih Berjalan" name="kondisi_usaha" value="Masih Berjalan" onChange={handleChange} /><Form.Check inline type="radio" label="Sudah Tutup" name="kondisi_usaha" value="Sudah Tutup" onChange={handleChange} /></Col></Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm={4}>Nama atau Brand Usaha</Form.Label>
+                                    <Col sm={8}><Form.Control type="text" name="nama_usaha" value={formData.nama_usaha || ''} onChange={handleChange} required /></Col>
+                                </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Nomor Telepon/HP Usaha</Form.Label>
-                                    <Col sm={8}><Form.Control type="text" name="nomor_telepon" onChange={handleChange} required /></Col>
+                                    <Col sm={8}><Form.Control type="text" name="nomor_telepon" value={formData.nomor_telepon || ''} onChange={handleChange} required /></Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm={4}>Foto Pemilik Usaha</Form.Label>
+                                    <Col sm={8}>
+                                        {formData.foto_pemilik && <Image src={formData.foto_pemilik} thumbnail width={100} className="mb-2"/>}
+                                        <Form.Control type="file" name="foto_pemilik" onChange={handleFileChange} />
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm={4}>Foto Tempat Usaha</Form.Label>
+                                    <Col sm={8}>
+                                        {formData.foto_tempat_usaha && <Image src={formData.foto_tempat_usaha} thumbnail width={100} className="mb-2"/>}
+                                        <Form.Control type="file" name="foto_tempat_usaha" onChange={handleFileChange} />
+                                    </Col>
                                 </Form.Group>
 
                                 {/* PERBAIKAN: Ganti input manual dengan peta interaktif */}
@@ -401,7 +420,7 @@ function UkmEdit() {
                                  <p className="fw-bold">LEGALITAS & KLASIFIKASI USAHA</p>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Badan Hukum/Legalitas</Form.Label><Col sm={8}><Form.Check type="radio" name="badan_hukum" label="Belum Ada" value="Belum Ada" onChange={handleChange} /><Form.Check type="radio" name="badan_hukum" label="Perseorangan" value="Perseorangan" onChange={handleChange} /></Col></Form.Group>
                                 
-                                {/* PERBAIKAN: Mengganti 'name' menjadi 'klasifikasi' */}
+                                {/* PERBAIKAN: Mengganti 'name' menjadi 'klasifikasi' '*/}
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Klasifikasi Usaha (Omset)</Form.Label>
                                     <Col sm={8}>

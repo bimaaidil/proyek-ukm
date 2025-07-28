@@ -13,7 +13,7 @@ function LoginPage({ setUser, showSuccessToast, showErrorToast }) {
         e.preventDefault();
 
         try {
-            // Mengambil alamat API dari environment variable
+            // Mengambil alamat API dari environment variablee
             const apiUrl = import.meta.env.VITE_API_URL;
 
             const response = await axios.post(`${apiUrl}/api/login`, {

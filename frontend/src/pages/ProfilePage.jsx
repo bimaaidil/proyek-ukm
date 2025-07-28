@@ -46,7 +46,6 @@ function ProfilePage() {
     const ukm = profile.ukm && profile.ukm.length > 0 ? profile.ukm[0] : null;
 
     // --- PERBAIKAN UTAMA DI SINI ---
-    // Langsung gunakan URL dari database karena sudah lengkap dari Cloudinary.
     // Tidak perlu lagi menggabungkan dengan apiUrl.
     const bannerImageUrl = ukm?.foto_tempat_usaha 
         ? ukm.foto_tempat_usaha 

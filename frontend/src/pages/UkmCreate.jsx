@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import api from '../api'; // 1. Impor instance axios terpusat
 
 function UkmCreate() {
     const [namaUsaha, setNamaUsaha] = useState('');
@@ -16,19 +16,21 @@ function UkmCreate() {
     const saveUkm = async (e) => {
         e.preventDefault();
         
-        // Mengambil alamat backend dari environment variable
-        const API_URL = import.meta.env.VITE_API_URL;
-
-        await axios.post(`${API_URL}/api/ukm`, {
-            nama_usaha: namaUsaha,
-            nama_pemilik: namaPemilik,
-            alamat: alamat,
-            kategori_usaha: kategoriUsaha,
-            nomor_telepon: nomorTelepon,
-            modal_usaha: parseFloat(modalUsaha), // Pastikan mengirim sebagai angka
-            // userId: 1, // Seharusnya ID pengguna didapat dari state atau token, bukan hardcoded
-        });
-        navigate('/');
+        try {
+            // 2. Gunakan 'api.post' agar token otentikasi otomatis ditambahkan
+            await api.post('/api/ukm', {
+                nama_usaha: namaUsaha,
+                nama_pemilik: namaPemilik,
+                alamat: alamat,
+                kategori_usaha: kategoriUsaha,
+                nomor_telepon: nomorTelepon,
+                modal_usaha: parseFloat(modalUsaha),
+            });
+            navigate('/');
+        } catch (error) {
+            console.error("Gagal menyimpan data UKM:", error);
+            // Anda bisa menambahkan notifikasi error untuk pengguna di sini
+        }
     };
 
     return (

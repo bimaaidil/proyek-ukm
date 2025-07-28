@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Table, Button, Form, Row, Col, InputGroup, Pagination, Spinner, Alert } from 'react-bootstrap';
 import { toast } from 'react-toastify';
-import MapDisplay from './MapDisplay';
+import MapDisplay from './MapDisplay'; // Pastikan komponen ini ada dan berfungsi
 import api from '../api';
 
 function UkmList() {
@@ -12,6 +12,7 @@ function UkmList() {
     // State untuk filter dan pencarian
     const [filter, setFilter] = useState('Semua');
     const [searchTerm, setSearchTerm] = useState('');
+    const [activeSearch, setActiveSearch] = useState('');
     
     // State untuk paginasi
     const [currentPage, setCurrentPage] = useState(1);
@@ -21,49 +22,49 @@ function UkmList() {
     const [mapCenter, setMapCenter] = useState([0.5071, 101.4478]); // Pusat Peta Pekanbaru
     const [mapZoom, setMapZoom] = useState(12);
 
-    const getUkms = async (page = 1, currentSearch = searchTerm, currentFilter = filter) => {
+    // --- PERBAIKAN: Gunakan useCallback agar fungsi ini tidak dibuat ulang terus-menerus ---
+    const getUkms = useCallback(async () => {
         setLoading(true);
         try {
             const params = new URLSearchParams({
-                page: page,
-                limit: 10, // Tampilkan 10 data per halaman
-                search: currentSearch,
+                page: currentPage,
+                limit: 10,
+                search: activeSearch,
             });
 
-            if (currentFilter !== 'Semua') {
-                params.append('klasifikasi', currentFilter);
+            if (filter !== 'Semua') {
+                params.append('klasifikasi', filter);
             }
 
             const response = await api.get(`/api/ukm?${params.toString()}`);
             
-            // PERBAIKAN: Pastikan kita mengambil array dari response.data.data
             if (response.data && Array.isArray(response.data.data)) {
                 setUkms(response.data.data);
                 setTotalPages(response.data.totalPages || 1);
                 setCurrentPage(response.data.currentPage || 1);
             } else {
-                console.error("Menerima format data yang tidak terduga:", response.data);
                 toast.error("Gagal memuat data: format tidak sesuai.");
-                setUkms([]); // Atur ke array kosong untuk mencegah crash
+                setUkms([]);
             }
         } catch (error) {
             toast.error(error.response?.data?.message || "Gagal mengambil data UKM.");
-            setUkms([]); // Atur ke array kosong jika terjadi error
+            setUkms([]);
         } finally {
             setLoading(false);
         }
-    };
+    }, [currentPage, activeSearch, filter]); // Dependensi untuk useCallback
 
+    // --- PERBAIKAN: useEffect sekarang hanya mengawasi perubahan dan memanggil getUkms ---
     useEffect(() => {
-        getUkms(1); // Muat data pertama kali saat komponen dimuat
-    }, []);
+        getUkms();
+    }, [getUkms]);
 
     const deleteUkm = async (id) => {
         if (window.confirm('Apakah Anda yakin ingin menghapus data ini?')) {
             try {
                 const response = await api.delete(`/api/ukm/${id}`);
                 toast.success(response.data.message);
-                getUkms(currentPage); // Muat ulang data di halaman saat ini
+                getUkms(); // Muat ulang data setelah hapus
             } catch (error) {
                 toast.error(error.response?.data?.message || 'Gagal menghapus data.');
             }
@@ -73,27 +74,22 @@ function UkmList() {
     const handleSearch = (e) => {
         e.preventDefault();
         setCurrentPage(1);
-        getUkms(1, searchTerm, filter);
+        setActiveSearch(searchTerm);
     };
 
     const handleFilterChange = (e) => {
         const newFilter = e.target.value;
         setFilter(newFilter);
         setCurrentPage(1);
-        getUkms(1, searchTerm, newFilter);
     };
 
     const handleReset = () => {
         setFilter('Semua');
         setSearchTerm('');
+        setActiveSearch('');
         setCurrentPage(1);
-        getUkms(1, '', 'Semua');
     };
     
-    const handlePageChange = (pageNumber) => {
-        getUkms(pageNumber, searchTerm, filter);
-    };
-
     const handleViewLocation = (lat, long) => {
         if (lat && long) {
             setMapCenter([lat, long]);
@@ -101,6 +97,21 @@ function UkmList() {
         } else {
             toast.warn('Data lokasi untuk usaha ini tidak tersedia.');
         }
+    };
+
+    // --- PERBAIKAN: Fungsi untuk membuat item paginasi yang lebih ringkas ---
+    const createPaginationItems = () => {
+        let items = [];
+        // Logika untuk menampilkan paginasi (misal: << < 1 ... 4 5 6 ... 10 > >>)
+        // Untuk sederhana, kita tetap tampilkan semua, tapi idealnya dibatasi
+        for (let number = 1; number <= totalPages; number++) {
+            items.push(
+                <Pagination.Item key={number} active={number === currentPage} onClick={() => setCurrentPage(number)}>
+                    {number}
+                </Pagination.Item>,
+            );
+        }
+        return items;
     };
 
     return (
@@ -180,15 +191,11 @@ function UkmList() {
                     {totalPages > 1 && (
                         <div className="d-flex justify-content-center">
                             <Pagination>
-                                <Pagination.First onClick={() => handlePageChange(1)} disabled={currentPage === 1} />
-                                <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
-                                {[...Array(totalPages).keys()].map(number => (
-                                    <Pagination.Item key={number + 1} active={number + 1 === currentPage} onClick={() => handlePageChange(number + 1)}>
-                                        {number + 1}
-                                    </Pagination.Item>
-                                ))}
-                                <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
-                                <Pagination.Last onClick={() => handlePageChange(totalPages)} disabled={currentPage === totalPages} />
+                                <Pagination.First onClick={() => setCurrentPage(1)} disabled={currentPage === 1} />
+                                <Pagination.Prev onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} />
+                                {createPaginationItems()}
+                                <Pagination.Next onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages} />
+                                <Pagination.Last onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages} />
                             </Pagination>
                         </div>
                     )}
