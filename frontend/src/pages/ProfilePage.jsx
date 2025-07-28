@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Row, Col, Card, Button, Image, Badge, Spinner, Alert } from 'react-bootstrap';
-import { MapPin, Building, Phone, Mail, Globe, Hash, Edit, Instagram, Facebook, Image as ImageIcon, User } from 'lucide-react';
+import { MapPin, Building, Phone, Mail, Globe, Facebook, Instagram, User, Edit } from 'lucide-react';
 import api from '../api';
-import './ProfilePage.css'; // File CSS ini tetap digunakan
+import './ProfilePage.css';
 
 function ProfilePage() {
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    // State dan fetch untuk mapsApiKey sudah dihapus karena tidak diperlukan lagi
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -45,19 +44,21 @@ function ProfilePage() {
     if (!profile) return null;
 
     const ukm = profile.ukm && profile.ukm.length > 0 ? profile.ukm[0] : null;
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-    const bannerImageUrl = ukm?.foto_tempat_usaha
-        ? `${apiUrl}/${ukm.foto_tempat_usaha.replace(/\\/g, '/')}`
+    // --- PERBAIKAN UTAMA DI SINI ---
+    // Langsung gunakan URL dari database karena sudah lengkap dari Cloudinary.
+    // Tidak perlu lagi menggabungkan dengan apiUrl.
+    const bannerImageUrl = ukm?.foto_tempat_usaha 
+        ? ukm.foto_tempat_usaha 
         : 'https://placehold.co/1200x400/0d6efd/FFFFFF?text=Tempat+Usaha';
     
     const profileImageUrl = ukm?.foto_pemilik 
-        ? `${apiUrl}/${ukm.foto_pemilik.replace(/\\/g, '/')}`
+        ? ukm.foto_pemilik
         : `https://placehold.co/150x150/EFEFEF/333?text=${profile.name.charAt(0)}`;
+    // --- AKHIR PERBAIKAN ---
 
     return (
         <div className="profile-page-visual">
-            {/* --- Bagian Header dengan Banner --- */}
             <div className="profile-header-container">
                 <Image src={bannerImageUrl} className="profile-banner-image" />
                 <div className="profile-header-content">
@@ -82,14 +83,10 @@ function ProfilePage() {
             <Container className="py-5">
                 {ukm ? (
                     <Row className="g-4">
-                        {/* --- Kolom Kiri: Informasi Detail --- */}
                         <Col lg={8}>
-                            {/* Card Tentang Usaha */}
                             <Card className="shadow-sm border-0 mb-4">
                                 <Card.Body className="p-4">
                                     <h5 className="fw-bold mb-3 d-flex align-items-center"><Building size={20} className="me-2 text-primary"/> Tentang Usaha</h5>
-                                    <p className="text-muted">
-                                    </p>
                                     <hr />
                                     <Row>
                                         <Col sm={6}><p className="mb-2"><strong>Klasifikasi:</strong> <Badge bg="info">{ukm.klasifikasi || '-'}</Badge></p></Col>
@@ -100,14 +97,12 @@ function ProfilePage() {
                                 </Card.Body>
                             </Card>
 
-                             {/* Card Lokasi */}
                             <Card className="shadow-sm border-0">
                                 <Card.Body className="p-4">
                                     <h5 className="fw-bold mb-3 d-flex align-items-center"><MapPin size={20} className="me-2 text-primary"/> Lokasi</h5>
                                     <p><strong>Alamat:</strong> {ukm.alamat}</p>
                                     <p><strong>Lingkungan:</strong> {ukm.lingkungan_lokasi || '-'}</p>
                                     
-                                    {/* PERBAIKAN: Ganti peta dengan tombol link */}
                                     {ukm.latitude && ukm.longitude ? (
                                         <Button 
                                             variant="outline-primary" 
@@ -123,7 +118,6 @@ function ProfilePage() {
                             </Card>
                         </Col>
 
-                        {/* --- Kolom Kanan: Kontak & Info Pemilik --- */}
                         <Col lg={4}>
                             <Card className="shadow-sm border-0">
                                 <Card.Body className="p-4">
@@ -134,7 +128,7 @@ function ProfilePage() {
                                         <li className="d-flex align-items-center mb-3"><Phone size={16} className="me-3 text-muted"/><span>{ukm.nomor_telepon || '-'}</span></li>
                                     </ul>
                                     <hr />
-                                     <ul className="list-unstyled">
+                                    <ul className="list-unstyled">
                                         {ukm.website && <li className="d-flex align-items-center mb-2"><Globe size={16} className="me-3 text-muted"/><a href={!ukm.website.startsWith('http') ? `http://${ukm.website}` : ukm.website} target="_blank" rel="noopener noreferrer">{ukm.website}</a></li>}
                                         {ukm.facebook && <li className="d-flex align-items-center mb-2"><Facebook size={16} className="me-3 text-muted"/><a href={!ukm.facebook.startsWith('http') ? `https://facebook.com/${ukm.facebook}` : ukm.facebook} target="_blank" rel="noopener noreferrer">{ukm.facebook}</a></li>}
                                         {ukm.instagram && <li className="d-flex align-items-center"><Instagram size={16} className="me-3 text-muted"/><a href={!ukm.instagram.startsWith('http') ? `https://instagram.com/${ukm.instagram}` : ukm.instagram} target="_blank" rel="noopener noreferrer">@{ukm.instagram}</a></li>}

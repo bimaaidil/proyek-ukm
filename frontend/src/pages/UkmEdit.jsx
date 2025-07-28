@@ -225,38 +225,46 @@ function UkmEdit() {
                 setFormData(combinedData);
 
                 if (combinedData.kabupaten && dataWilayah[combinedData.kabupaten]) { setKecamatanList(Object.keys(dataWilayah[combinedData.kabupaten])); }
-                if (combinedData.kecamatan && dataWilayah[combinedData.kabupaten]?.[combinedData.kecamatan]) { setDesaList(dataWilayah[combinedData.kabupaten][combinedData.kecamatan]); }
+                if (combinedData.kabupaten && combinedData.kecamatan && dataWilayah[combinedData.kabupaten][combinedData.kecamatan]) { setDesaList(dataWilayah[combinedData.kabupaten][combinedData.kecamatan]); }
+                
                 setLoading(false);
             } catch (err) {
                 setError('Gagal mengambil data UKM.');
                 setLoading(false);
+                toast.error('Gagal mengambil data UKM.');
             }
         };
         fetchUkmData();
     }, [id]);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        const { name, value, type, checked } = e.target;
+        // Menangani radio button
+        if (type === 'radio') {
+            setFormData(prev => ({ ...prev, [name]: value }));
+        } else {
+            setFormData(prev => ({ ...prev, [name]: value }));
+        }
     };
     
     const handleLocationSelect = (coords) => {
         setFormData(prev => ({...prev, latitude: coords.lat.toFixed(6), longitude: coords.lng.toFixed(6) }));
     };
+
     const handleKabupatenChange = (e) => {
         const kab = e.target.value;
-        handleChange(e);
+        setFormData(prev => ({ ...prev, kabupaten: kab, kecamatan: '', desa: '' }));
         if (kab && dataWilayah[kab]) { setKecamatanList(Object.keys(dataWilayah[kab])); } else { setKecamatanList([]); }
         setDesaList([]);
-        setFormData(prev => ({ ...prev, kecamatan: '', desa: '' }));
     };
+
     const handleKecamatanChange = (e) => {
         const kec = e.target.value;
-        handleChange(e);
+        setFormData(prev => ({ ...prev, kecamatan: kec, desa: '' }));
         const kab = formData.kabupaten;
-        if (kab && kec && dataWilayah[kab][kec]) { setDesaList(dataWilayah[kab][kec]); } else { setDesaList([]); }
-        setFormData(prev => ({ ...prev, desa: '' }));
+        if (kab && kec && dataWilayah[kab]?.[kec]) { setDesaList(dataWilayah[kab][kec]); } else { setDesaList([]); }
     };
+
     const handleFileChange = (e) => {
         setFiles(prev => ({ ...prev, [e.target.name]: e.target.files[0] }));
     };
@@ -267,12 +275,14 @@ function UkmEdit() {
         const data = new FormData();
         for (const key in formData) { if (formData[key] !== null && formData[key] !== undefined) { data.append(key, formData[key]); } }
         for (const key in files) { if (files[key]) { data.append(key, files[key]); } }
+        
         try {
             await api.put(`/api/ukm/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } });
             toast.success('Data usaha berhasil diperbarui!');
             navigate('/dashboard');
         } catch (err) {
             setError(err.response?.data?.message || 'Update gagal.');
+            toast.error(err.response?.data?.message || 'Update gagal.');
         }
     };
 
@@ -290,18 +300,18 @@ function UkmEdit() {
                             {error && <Alert variant="danger">{error}</Alert>}
                             <Form onSubmit={handleSubmit}>
                                 
-                                 <p className="fw-bold">DATA DIRI</p>
+                                <p className="fw-bold">DATA DIRI</p>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm={4}>Nomor Induk Kependudukan (NIK)</Form.Label>
-                                    <Col sm={8}><Form.Control type="text" name="nik" onChange={handleChange} required /></Col>
+                                    <Form.Label column sm={4}>Nama Pelaku Usaha</Form.Label>
+                                    <Col sm={8}><Form.Control type="text" name="name" value={formData.name || ''} onChange={handleChange} required /></Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm={4}>Nomor Kartu Keluarga (KK)</Form.Label>
-                                    <Col sm={8}><Form.Control type="text" name="nomor_kk" onChange={handleChange} required /></Col>
+                                    <Form.Label column sm={4}>NIK</Form.Label>
+                                    <Col sm={8}><Form.Control type="text" name="nik" value={formData.nik || ''} onChange={handleChange} required /></Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm={4}>Nama Pelaku Usaha (sesuai KTP)</Form.Label>
-                                    <Col sm={8}><Form.Control type="text" name="name" onChange={handleChange} required /></Col>
+                                    <Form.Label column sm={4}>Email</Form.Label>
+                                    <Col sm={8}><Form.Control type="email" name="email" value={formData.email || ''} onChange={handleChange} required /></Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Tempat & Tanggal Lahir</Form.Label>
@@ -324,24 +334,20 @@ function UkmEdit() {
                                     <Col sm={8}><Form.Control type="file" name="foto_ktp" onChange={handleFileChange} required /></Col>
                                 </Form.Group>
                                 <hr/>
-                                <p className="fw-bold">ALAMAT PELAKU USAHA (Sesuai Domisili)</p>
-                                <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm={4}>Provinsi</Form.Label>
-                                    <Col sm={8}><Form.Control type="text" name="provinsi" value="RIAU" readOnly /></Col>
-                                </Form.Group>
+<p className="fw-bold">ALAMAT PELAKU USAHA</p>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Kabupaten/Kota</Form.Label>
                                     <Col sm={8}>
-                                        <Form.Select name="kabupaten" onChange={handleKabupatenChange} required>
+                                        <Form.Select name="kabupaten" value={formData.kabupaten || ''} onChange={handleKabupatenChange} required>
                                             <option value="">--Pilih Nama Kabupaten--</option>
                                             {kabupatenList.map(kab => <option key={kab} value={kab}>{kab}</option>)}
                                         </Form.Select>
                                     </Col>
                                 </Form.Group>
-                                 <Form.Group as={Row} className="mb-3">
+                                <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Kecamatan</Form.Label>
                                     <Col sm={8}>
-                                        <Form.Select name="kecamatan" onChange={handleKecamatanChange} required disabled={kecamatanList.length === 0}>
+                                        <Form.Select name="kecamatan" value={formData.kecamatan || ''} onChange={handleKecamatanChange} required disabled={!kecamatanList.length}>
                                             <option value="">--Pilih Nama Kecamatan--</option>
                                             {kecamatanList.map(kec => <option key={kec} value={kec}>{kec}</option>)}
                                         </Form.Select>
@@ -350,7 +356,7 @@ function UkmEdit() {
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Desa/Kelurahan</Form.Label>
                                     <Col sm={8}>
-                                        <Form.Select name="desa" onChange={handleChange} required disabled={desaList.length === 0}>
+                                        <Form.Select name="desa" value={formData.desa || ''} onChange={handleChange} required disabled={!desaList.length}>
                                             <option value="">--Pilih Nama Desa/Kelurahan--</option>
                                             {desaList.map(desa => <option key={desa} value={desa}>{desa}</option>)}
                                         </Form.Select>

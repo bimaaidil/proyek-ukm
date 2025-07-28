@@ -10,24 +10,26 @@ function UkmCreate() {
     const [alamat, setAlamat] = useState('');
     const [kategoriUsaha, setKategoriUsaha] = useState('');
     const [nomorTelepon, setNomorTelepon] = useState('');
-    const [modalUsaha, setModalUsaha] = useState(''); // <-- 1. Tambahkan state baru
+    const [modalUsaha, setModalUsaha] = useState('');
     const navigate = useNavigate();
 
-    // ...
     const saveUkm = async (e) => {
         e.preventDefault();
-        await axios.post('http://localhost:5000/api/ukm', {
+        
+        // Mengambil alamat backend dari environment variable
+        const API_URL = import.meta.env.VITE_API_URL;
+
+        await axios.post(`${API_URL}/api/ukm`, {
             nama_usaha: namaUsaha,
             nama_pemilik: namaPemilik,
             alamat: alamat,
             kategori_usaha: kategoriUsaha,
             nomor_telepon: nomorTelepon,
-            modal_usaha: modalUsaha,
-            userId: 1, // <-- KIRIM ID USER (UNTUK SEMENTARA KITA ISI 1)
+            modal_usaha: parseFloat(modalUsaha), // Pastikan mengirim sebagai angka
+            // userId: 1, // Seharusnya ID pengguna didapat dari state atau token, bukan hardcoded
         });
         navigate('/');
     };
-// ...
 
     return (
         <div>
@@ -53,8 +55,6 @@ function UkmCreate() {
                     <Form.Label>Nomor Telepon</Form.Label>
                     <Form.Control type="text" value={nomorTelepon} onChange={(e) => setNomorTelepon(e.target.value)} placeholder="Masukkan Nomor Telepon" />
                 </Form.Group>
-
-                {/* 3. Tambahkan input untuk Modal Usaha */}
                 <Form.Group className="mb-3">
                     <Form.Label>Modal Usaha (Rp)</Form.Label>
                     <Form.Control type="number" value={modalUsaha} onChange={(e) => setModalUsaha(e.target.value)} placeholder="Contoh: 50000000" />
