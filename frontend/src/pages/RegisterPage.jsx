@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod'; // <-- PERBAIKAN: Baris yang hilang ditambahkan di sini
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Container, Row, Col, Card } from 'react-bootstrap';
