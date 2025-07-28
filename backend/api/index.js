@@ -20,7 +20,14 @@ const prisma = new PrismaClient();
 // KONFIGURASI & MIDDLEWARE
 // ====================================================================
 
-app.use(cors());
+// PERBAIKAN: Konfigurasi CORS yang lebih eksplisit
+app.use(cors({
+  origin: "*", // Izinkan semua origin
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+}));
+
 app.use(express.json());
 
 // Health Check Route untuk halaman utama
