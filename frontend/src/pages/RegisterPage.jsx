@@ -199,6 +199,16 @@ const dataWilayah = {
     }
 };
 
+// Definisikan skema validasi menggunakan Zod
+const registerSchema = z.object({
+  name: z.string().min(3, "Nama harus diisi, minimal 3 karakter"),
+  nik: z.string().length(16, "NIK harus 16 digit"),
+  email: z.string().email("Format email tidak valid"),
+  password: z.string().min(6, "Password minimal 6 karakter"),
+  // Tambahkan validasi untuk field lain jika perlu
+  nama_usaha: z.string().min(1, "Nama usaha harus diisi"),
+});
+
 function RegisterPage({ showSuccessToast, showErrorToast }) {
     const [formData, setFormData] = useState({
         provinsi: "RIAU",

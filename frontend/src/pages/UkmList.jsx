@@ -1,3 +1,4 @@
+import DashboardSkeleton from './DashboardSkeleton';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Table, Button, Form, Row, Col, InputGroup, Pagination, Spinner, Alert } from 'react-bootstrap';
@@ -150,11 +151,9 @@ function UkmList() {
                 </Col>
             </Row>
 
-            {loading ? (
-                <div className="text-center my-5">
-                    <Spinner animation="border" />
-                    <p className="mt-2">Memuat data...</p>
-                </div>
+           {loading ? (
+                // 2. Ganti Spinner dengan komponen Skeleton
+                <DashboardSkeleton />
             ) : ukms.length === 0 ? (
                 <Alert variant="info">Tidak ada data UMKM yang ditemukan.</Alert>
             ) : (
