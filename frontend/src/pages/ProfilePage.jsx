@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Container, Row, Col, Card, Button, Image, Badge, Spinner, Alert } from 'react-bootstrap';
+// --- PERBAIKAN 1: Mengubah nama komponen 'Image' menjadi 'BootstrapImage' ---
+import { Container, Row, Col, Card, Button, Image as BootstrapImage, Badge, Spinner, Alert } from 'react-bootstrap';
 import { MapPin, Building, Phone, Mail, Globe, Facebook, Instagram, User, Edit } from 'lucide-react';
 import api from '../api';
 import './ProfilePage.css';
@@ -45,8 +46,7 @@ function ProfilePage() {
 
     const ukm = profile.ukm && profile.ukm.length > 0 ? profile.ukm[0] : null;
 
-    // --- PERBAIKAN UTAMA DI SINI ---
-    // Tidak perlu lagi menggabungkan dengan apiUrl.
+    // --- PERBAIKAN 2: Langsung gunakan URL dari database karena sudah lengkap dari Cloudinary ---
     const bannerImageUrl = ukm?.foto_tempat_usaha 
         ? ukm.foto_tempat_usaha 
         : 'https://placehold.co/1200x400/0d6efd/FFFFFF?text=Tempat+Usaha';
@@ -54,14 +54,14 @@ function ProfilePage() {
     const profileImageUrl = ukm?.foto_pemilik 
         ? ukm.foto_pemilik
         : `https://placehold.co/150x150/EFEFEF/333?text=${profile.name.charAt(0)}`;
-    // --- AKHIR PERBAIKAN ---
 
     return (
         <div className="profile-page-visual">
             <div className="profile-header-container">
-                <Image src={bannerImageUrl} className="profile-banner-image" />
+                {/* --- PERBAIKAN 1 (Lanjutan): Gunakan nama komponen baru --- */}
+                <BootstrapImage src={bannerImageUrl} className="profile-banner-image" />
                 <div className="profile-header-content">
-                    <Image 
+                    <BootstrapImage 
                         src={profileImageUrl} 
                         roundedCircle 
                         className="profile-avatar"
@@ -106,7 +106,7 @@ function ProfilePage() {
                                         <Button 
                                             variant="outline-primary" 
                                             size="sm"
-                                            href={`https://www.google.com/maps?q=${ukm.latitude},${ukm.longitude}`} 
+                                            href={`https://maps.google.com/?q=${ukm.latitude},${ukm.longitude}`} 
                                             target="_blank" 
                                             rel="noopener noreferrer"
                                         >
@@ -138,7 +138,7 @@ function ProfilePage() {
                     </Row>
                 ) : (
                     <Alert variant="info">
-                        Anda belum memiliki data usaha yang terdaftar. Silakan lengkapi profil Anda.
+                        Anda belum memiliki data usaha yang terdaftar.
                     </Alert>
                 )}
             </Container>

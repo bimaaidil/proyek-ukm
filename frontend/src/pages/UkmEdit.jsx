@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Form, Button, Container, Row, Col, Card, Alert, Spinner } from 'react-bootstrap';
+import { useNavigate, useParams, Link } from 'react-router-dom';
+// --- PERBAIKAN: Mengganti nama komponen 'Image' menjadi 'BootstrapImage' ---
+import { Form, Button, Container, Row, Col, Card, Alert, Spinner, Image as BootstrapImage } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import MapPicker from './MapPicker';
-import api from '../api'; // Gunakan instance axios dari api.js
+import api from '../api';
 
 const dataWilayah= {
     "BENGKALIS": {
@@ -387,14 +388,14 @@ function UkmEdit() {
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Foto Pemilik Usaha</Form.Label>
                                     <Col sm={8}>
-                                        {formData.foto_pemilik && <Image src={formData.foto_pemilik} thumbnail width={100} className="mb-2"/>}
+                                        {formData.foto_pemilik && <BootstrapImage src={formData.foto_pemilik}/>}
                                         <Form.Control type="file" name="foto_pemilik" onChange={handleFileChange} />
                                     </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Foto Tempat Usaha</Form.Label>
                                     <Col sm={8}>
-                                        {formData.foto_tempat_usaha && <Image src={formData.foto_tempat_usaha} thumbnail width={100} className="mb-2"/>}
+                                        {formData.foto_tempat_usaha && <BootstrapImage src={formData.foto_tempat_usaha}/>}
                                         <Form.Control type="file" name="foto_tempat_usaha" onChange={handleFileChange} />
                                     </Col>
                                 </Form.Group>
