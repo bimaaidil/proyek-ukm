@@ -21,12 +21,12 @@ const prisma = new PrismaClient();
 // ====================================================================
 
 // PERBAIKAN: Konfigurasi CORS yang lebih eksplisit
-app.use(cors({
-  origin: "*", // Izinkan semua origin
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  preflightContinue: false,
-  optionsSuccessStatus: 204
-}));
+//app.use(cors({
+  //origin: "*", // Izinkan semua origin
+  //methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  //preflightContinue: false,
+  //optionsSuccessStatus: 204
+//}));
 
 app.use(express.json());
 
