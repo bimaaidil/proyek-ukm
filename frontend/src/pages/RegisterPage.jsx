@@ -347,6 +347,9 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Foto KTP</Form.Label>
                                     <Col sm={8}><Form.Control type="file" name="foto_ktp" onChange={handleFileChange} required /></Col>
+                                        <p style={{ fontSize: '12px', color: '#888', marginTop: '4px' }}>
+                                            Ukuran file maksimal: 2 MB
+                                        </p>
                                 </Form.Group>
                                 <hr />
                                 <p className="fw-bold">ALAMAT PELAKU USAHA (Sesuai Domisili)</p>
