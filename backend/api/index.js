@@ -1,4 +1,3 @@
-// Trigger deployment 29 Juli 2025
 import express from 'express';
 import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
@@ -9,9 +8,6 @@ import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
-
-// Impor helper untuk upload ke cloud storage (misalnya Cloudinary)
-// Anda perlu menginstal package-nya: npm install cloudinary
 import { v2 as cloudinary } from 'cloudinary';
 
 const app = express();
@@ -21,51 +17,44 @@ const prisma = new PrismaClient();
 // KONFIGURASI & MIDDLEWARE
 // ====================================================================
 
-// --- PERBAIKAN UTAMA: Konfigurasi CORS yang lebih aman ---
-// Hanya izinkan permintaan dari URL frontend Anda yang sudah didefinisikan
-// di environment variable. Ini jauh lebih aman daripada mengizinkan semua origin (*).
+// Konfigurasi CORS
 const corsOptions = {
-    origin: process.env.FRONTEND_URL, // Contoh: 'https://proyek-ukm.vercel.app'
+    origin: process.env.FRONTEND_URL,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    optionsSuccessStatus: 200 // Beberapa browser lawas bermasalah dengan status 204
+    credentials: true,
+    optionsSuccessStatus: 200
 };
+
+// PENTING: Terapkan middleware dari urutan paling umum ke spesifik
 app.use(cors(corsOptions));
+app.use(express.json()); // Middleware untuk membaca body JSON dari request
 
-app.use(express.json());
-
-// Health Check Route untuk halaman utama
-app.get("/", (req, res) => {
-  res.send("Backend API Proyek UKM sedang berjalan!");
-});
-
-// --- PERUBAHAN 1: KONFIGURASI UPLOAD FILE UNTUK VERCEL ---
-// Vercel tidak punya sistem file permanen, jadi kita gunakan 'memoryStorage'
-// untuk memproses file di memori sebelum diunggah ke cloud.
+// Konfigurasi Multer untuk Vercel (upload ke memori)
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// Konfigurasi Cloudinary (atau layanan lain seperti AWS S3)
-// Pastikan Anda sudah mengatur variabel ini di Environment Variables Vercel
-cloudinary.config({ 
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
-  api_key: process.env.CLOUDINARY_API_KEY, 
-  api_secret: process.env.CLOUDINARY_API_SECRET 
+// Konfigurasi Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
 // Helper function untuk upload stream ke Cloudinary
 const uploadToCloudinary = (fileBuffer) => {
-  return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      { resource_type: "auto" },
-      (error, result) => {
-        if (error) reject(error);
-        else resolve(result);
-      }
-    );
-    uploadStream.end(fileBuffer);
-  });
+    return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+            { resource_type: "auto" },
+            (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+            }
+        );
+        uploadStream.end(fileBuffer);
+    });
 };
 
+// Middleware untuk otentikasi token JWT
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -78,9 +67,15 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
+
 // ====================================================================
 // RUTE-RUTE APLIKASI
 // ====================================================================
+
+// Health Check Route
+app.get("/", (req, res) => {
+    res.send("Backend API Proyek UKM sedang berjalan!");
+});
 
 // Rute Publik
 app.get('/api/maps-key', (req, res) => {
@@ -104,8 +99,7 @@ app.post('/api/register',
             }
 
             const hashedPassword = await bcrypt.hash(password, 10);
-            
-            // Proses upload semua file yang ada ke Cloudinary secara bersamaan
+
             const fotoKtpFile = req.files?.foto_ktp?.[0];
             const fileNibFile = req.files?.file_nib?.[0];
             const fotoPemilikFile = req.files?.foto_pemilik?.[0];
@@ -118,7 +112,6 @@ app.post('/api/register',
                 fotoTempatUsahaFile ? uploadToCloudinary(fotoTempatUsahaFile.buffer) : Promise.resolve(null),
             ]);
 
-            // Simpan URL dari Cloudinary ke database
             await prisma.user.create({
                 data: {
                     name: req.body.name,
@@ -219,7 +212,7 @@ app.post('/api/forgot-password', async (req, res) => {
 
         const transporter = nodemailer.createTransport({
             host: process.env.EMAIL_HOST,
-            port: process.env.EMAIL_PORT,
+            port: parseInt(process.env.EMAIL_PORT, 10),
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS,
@@ -339,8 +332,6 @@ app.get('/api/ukm/:id', authenticateToken, async (req, res) => {
     }
 });
 
-// PENTING: Anda perlu menerapkan logika upload ke Cloudinary di rute PUT ini juga
-// jika Anda ingin mengizinkan pengguna mengubah file mereka.
 app.put('/api/ukm/:id', authenticateToken, upload.fields([
     { name: 'foto_ktp', maxCount: 1 }, { name: 'file_nib', maxCount: 1 },
     { name: 'foto_pemilik', maxCount: 1 }, { name: 'foto_tempat_usaha', maxCount: 1 }
@@ -356,23 +347,16 @@ app.put('/api/ukm/:id', authenticateToken, upload.fields([
                 return res.status(403).json({ message: "Anda tidak punya hak untuk mengubah data ini." });
             }
             
-            // TODO: Tambahkan logika untuk mengunggah file baru ke Cloudinary
-            // dan menghapus file lama jika perlu.
+            // TODO: Tambahkan logika untuk mengunggah file baru ke Cloudinary dan menghapus file lama jika perlu.
             
             const { name, email, nama_usaha, alamat_lengkap } = req.body;
-            const ukmDataToUpdate = { nama_usaha, alamat: alamat_lengkap };
-            const userDataToUpdate = { name, email };
-
-            // TODO: Update data di database dengan data baru, termasuk URL file baru
+            // TODO: Pastikan validasi dan update data dilakukan dengan benar
+            // const ukmDataToUpdate = { nama_usaha, alamat: alamat_lengkap };
+            // const userDataToUpdate = { name, email };
             
             res.status(200).json({ message: "Data berhasil diperbarui!" });
         } catch (error) {
             console.error("Error saat update:", error);
-            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-                const target = error.meta.target;
-                if (target.includes('email')) { return res.status(409).json({ message: "Email ini sudah digunakan." }); }
-                if (target.includes('nik')) { return res.status(409).json({ message: "NIK ini sudah terdaftar." }); }
-            }
             res.status(500).json({ message: "Terjadi kesalahan pada server." });
         }
     }
@@ -389,22 +373,15 @@ app.delete('/api/ukm/:id', authenticateToken, async (req, res) => {
             return res.status(403).json({ message: "Anda tidak punya hak untuk menghapus data ini." });
         }
 
-        // TODO: Tambahkan logika untuk menghapus file dari Cloudinary
-        // sebelum menghapus data dari database.
+        // TODO: Tambahkan logika untuk menghapus file dari Cloudinary sebelum menghapus data dari database.
         
         await prisma.ukm.delete({ where: { id: ukmId } });
         res.status(200).json({ message: 'Data UKM berhasil dihapus.' });
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
 });
 
-
-// ====================================================================
-// --- PERSIAPAN UNTUK VERCEL ---
-// ====================================================================
-
-// Baris app.listen() DIHAPUS karena Vercel menanganinya secara otomatis.
 
 // Ekspor variabel 'app' agar Vercel bisa menggunakannya sebagai Serverless Function.
 export default app;
