@@ -20,13 +20,15 @@ const prisma = new PrismaClient();
 // KONFIGURASI & MIDDLEWARE
 // ====================================================================
 
-// PERBAIKAN: Konfigurasi CORS yang lebih eksplisit
-//app.use(cors({
-  //origin: "*", // Izinkan semua origin
-  //methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  //preflightContinue: false,
-  //optionsSuccessStatus: 204
-//}));
+// --- PERBAIKAN UTAMA: Konfigurasi CORS yang lebih aman ---
+// Hanya izinkan permintaan dari URL frontend Anda yang sudah didefinisikan
+// di environment variable. Ini jauh lebih aman daripada mengizinkan semua origin (*).
+const corsOptions = {
+    origin: process.env.FRONTEND_URL, // Contoh: 'https://proyek-ukm.vercel.app'
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    optionsSuccessStatus: 200 // Beberapa browser lawas bermasalah dengan status 204
+};
+app.use(cors(corsOptions));
 
 app.use(express.json());
 
