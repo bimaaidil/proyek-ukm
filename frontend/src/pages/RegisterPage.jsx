@@ -330,7 +330,15 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Nomor Kartu Keluarga (KK)</Form.Label>
-                                    <Col sm={8}><Form.Control type="text" name="nomor_kk" onChange={handleChange} required /></Col>
+                                    <Col sm={8}>
+                                    <Form.Control 
+                                        type="text" 
+                                        name="no KK"
+                                        onChange={handleChange} 
+                                        required 
+                                        placeholder="No kk Max: 16 angka"
+                                    />
+                                </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Nama Pelaku Usaha (sesuai KTP)</Form.Label>
@@ -391,7 +399,15 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Alamat Lengkap</Form.Label>
-                                    <Col sm={8}><Form.Control as="textarea" rows={3} name="alamat_lengkap" onChange={handleChange} required /></Col>
+                                    <Col sm={8}>
+                                    <Form.Control 
+                                        type="text" 
+                                        name="alamat lengkap"
+                                        onChange={handleChange} 
+                                        required 
+                                        placeholder="Cth : Jalan Mawar No. 12, RT 005/RW 002, Kelurahan Harapan Jaya, Kecamatan Tenayan Raya,Kota Pekanbaru 28111"
+                                    />
+                                </Col>
                                 </Form.Group>
                                 <hr />
                                 <p className="fw-bold">DATA BRAND USAHA</p>
