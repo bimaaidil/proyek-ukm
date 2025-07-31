@@ -346,10 +346,7 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Foto KTP</Form.Label>
-                                    <Col sm={8}><Form.Control type="file" name="foto_ktp" onChange={handleFileChange} required /></Col>
-                                        <p style={{ fontSize: '12px', color: '#888', marginTop: '4px' }}>
-                                            Ukuran file maksimal: 2 MB
-                                        </p>
+                                    <Col sm={8}><Form.Control type="file" name="foto_ktp" onChange={handleFileChange} required /><p style={{ fontSize: '12px', color: '#888', marginTop: '4px' }}>Ukuran file maksimal: 2 MB</p></Col>
                                 </Form.Group>
                                 <hr />
                                 <p className="fw-bold">ALAMAT PELAKU USAHA (Sesuai Domisili)</p>
@@ -428,8 +425,8 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
                                 <hr />
                                 <p className="fw-bold">INFORMASI TAMBAHAN</p>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Lingkungan Lokasi Usaha</Form.Label><Col sm={8}><Form.Check type="radio" name="lingkungan_lokasi" label="Dalam Pemukiman/Perumahan" value="Pemukiman" onChange={handleChange} /><Form.Check type="radio" name="lingkungan_lokasi" label="Dalam Pasar/Pusat Perbelanjaan/Mall" value="Pusat Perbelanjaan" onChange={handleChange} /><Form.Check type="radio" name="lingkungan_lokasi" label="Dalam Ruko/Rukan" value="Ruko" onChange={handleChange} /></Col></Form.Group>
-                                <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Foto Pemilik Usaha</Form.Label><Col sm={8}><Form.Control type="file" name="foto_pemilik" onChange={handleFileChange} /></Col></Form.Group>
-                                <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Foto Tempat Usaha</Form.Label><Col sm={8}><Form.Control type="file" name="foto_tempat_usaha" onChange={handleFileChange} /></Col></Form.Group>
+                                <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Foto Pemilik Usaha</Form.Label><Col sm={8}><Form.Control type="file" name="foto_pemilik" onChange={handleFileChange} /><Form.Text className="text-muted">Ukuran file maksimal: 2 MB</Form.Text></Col></Form.Group>
+                                <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Foto Tempat Usaha</Form.Label><Col sm={8}><Form.Control type="file" name="foto_tempat_usaha" onChange={handleFileChange} /><Form.Text className="text-muted">Ukuran file maksimal: 2 MB</Form.Text></Col></Form.Group>
                                 <hr />
                                 <p className="fw-bold">DATA AKUN & KONTAK</p>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Alamat Email</Form.Label><Col sm={8}><Form.Control type="email" name="email" onChange={handleChange} required /></Col></Form.Group>
