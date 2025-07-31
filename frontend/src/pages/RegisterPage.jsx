@@ -299,23 +299,31 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
         }
     };
 
-    return (
-        <Container className="my-5">
-        <Row className="g-4"> {/* g-4 menambahkan jarak antar kolom */}
-            <Col md={4}>
-                <div className="p-3 border rounded bg-light">
-                    <h4><i className="bi bi-info-circle me-2"></i>Informasi</h4>
+return (
+    <Container className="my-5">
+        <Row className="g-5"> {/* g-5 memberi jarak yang lebih besar antar kolom */}
+
+            {/* Kolom 1: Informasi */}
+            <Col lg={5} xl={4}> {/* Kolom ini lebih kecil di layar besar */}
+                <div className="p-4 border rounded-3 bg-light position-sticky" style={{ top: '2rem' }}>
+                    <h4 className="d-flex align-items-center">
+                        {/* Ganti dengan ikon Anda jika ada, atau gunakan teks saja */}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-info-circle-fill me-2" viewBox="0 0 16 16">
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zM8 4a.905.905 0 0 1 .9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995A.905.905 0 0 1 8 4zm.904 6.442a1 1 0 1 1-1.808 0 1 1 0 0 1 1.808 0z"/>
+                        </svg>
+                        Informasi
+                    </h4>
                     <hr />
-                    <p>
+                    <p className="text-muted">
                         Selamat datang di SI-IMKM RIAU. Silakan lakukan registrasi untuk mendaftarkan Usaha anda.
                     </p>
-                    <p>
+                    <p className="text-muted">
                         Setelah proses registrasi berhasil, maka <strong>NIK</strong> dan <strong>Password</strong> yang anda ketikkan akan menjadi akun untuk login.
                     </p>
-                    <p>
+                    <p className="text-muted">
                         Tahapan yang harus dilakukan setelah berhasil login, sebagai berikut:
                     </p>
-                    <ol>
+                    <ol className="text-muted">
                         <li>Pastikan anda mengupdate data pada menu Data -{">"} Profil</li>
                         <li>Pastikan anda menginput/mengupdate data Usaha Anda pada menu Data -{">"} Usaha</li>
                         <li>Anda dapat merubah profil usaha anda</li>
