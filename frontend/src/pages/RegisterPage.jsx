@@ -318,7 +318,7 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
                                 <p className="fw-bold">DATA DIRI</p>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Nomor Induk Kependudukan (NIK)</Form.Label>
-                                    <Col sm={8}><Form.Control type="text" name="nik" onChange={handleChange} required /></Col>
+                                    <Col sm={8}><Form.Control type="text" name="nik" onChange={handleChange} required maxLength="16" pattern="\d{16}" title="NIK harus terdiri dari 16 digit angka." inputMode="numeric"/></Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Nomor Kartu Keluarga (KK)</Form.Label>
