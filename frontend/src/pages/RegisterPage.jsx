@@ -357,7 +357,7 @@ return (
                                     <Col sm={8}>
                                     <Form.Control 
                                         type="text" 
-                                        name="no KK"
+                                        name="nomor_kk"
                                         onChange={handleChange} 
                                         required 
                                         placeholder="No kk Max: 16 angka"
@@ -426,7 +426,7 @@ return (
                                     <Col sm={8}>
                                     <Form.Control 
                                         type="text" 
-                                        name="alamat lengkap"
+                                        name="alamat"
                                         onChange={handleChange} 
                                         required 
                                         placeholder="Cth : Jalan Mawar No. 12, RT 005/RW 002, Kelurahan Harapan Jaya, Kecamatan Tenayan Raya,Kota Pekanbaru 28111"
