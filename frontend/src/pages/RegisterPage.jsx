@@ -324,7 +324,7 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
                                         name="nik" 
                                         onChange={handleChange} 
                                         required 
-                                        placeholder="NIK Maksimal: 16 Angka" 
+                                        placeholder="Nik Max: 16 angka"
                                     />
                                 </Col>
                                 </Form.Group>
@@ -456,7 +456,7 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Alamat Email</Form.Label><Col sm={8}><Form.Control type="email" name="email" onChange={handleChange} required /></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Password</Form.Label><Col sm={8}><Form.Control type="password" name="password" onChange={handleChange} required /></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Alamat Website</Form.Label><Col sm={8}><Form.Control type="text" name="website" onChange={handleChange} /></Col></Form.Group>
-                                <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Akun Facebook</Form.Label><Col sm={8}><Form.Control type="text" name="facebook" onChange={handleChange} /></Col></Form.Group>
+                                <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Akun Twitter</Form.Label><Col sm={8}><Form.Control type="text" name="twitter" onChange={handleChange} /></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Akun Instagram</Form.Label><Col sm={8}><Form.Control type="text" name="instagram" onChange={handleChange} /></Col></Form.Group>
                                 <div className="d-grid mt-4">
                                     <Button variant="primary" type="submit">Kirim Data</Button>
