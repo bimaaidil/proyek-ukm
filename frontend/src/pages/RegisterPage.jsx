@@ -330,12 +330,13 @@ return (
                     </ol>
                 </div>
             </Col>
+
         <Container className="my-5">
             <Row className="justify-content-md-center">
-                <Col md={10}>
-                    <Card>
+                <Col lg={7} xl={8}>
+                    <Card className="shadow-sm">
                         <Card.Header as="h4">Form Registrasi Pelaku & Brand Usaha</Card.Header>
-                        <Card.Body>
+                        <Card.Body className="p-4">
                             <Form onSubmit={handleSubmit}>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Apakah anda berprofesi sebagai PNS/TNI/POLRI/PEGAWAI BUMN/BUMD?</Form.Label>
