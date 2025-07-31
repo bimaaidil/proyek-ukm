@@ -429,7 +429,7 @@ return (
                                         name="alamat"
                                         onChange={handleChange} 
                                         required 
-                                        placeholder="Cth : Jalan Mawar No. 12, RT 005/RW 002, Kelurahan Harapan Jaya, Kecamatan Tenayan Raya,Kota Pekanbaru 28111"
+                                        placeholder="alamat lengkap"
                                     />
                                 </Col>
                                 </Form.Group>
