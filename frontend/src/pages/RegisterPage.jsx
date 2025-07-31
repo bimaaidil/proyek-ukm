@@ -301,6 +301,28 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
 
     return (
         <Container className="my-5">
+        <Row className="g-4"> {/* g-4 menambahkan jarak antar kolom */}
+            <Col md={4}>
+                <div className="p-3 border rounded bg-light">
+                    <h4><i className="bi bi-info-circle me-2"></i>Informasi</h4>
+                    <hr />
+                    <p>
+                        Selamat datang di SI-IMKM RIAU. Silakan lakukan registrasi untuk mendaftarkan Usaha anda.
+                    </p>
+                    <p>
+                        Setelah proses registrasi berhasil, maka <strong>NIK</strong> dan <strong>Password</strong> yang anda ketikkan akan menjadi akun untuk login.
+                    </p>
+                    <p>
+                        Tahapan yang harus dilakukan setelah berhasil login, sebagai berikut:
+                    </p>
+                    <ol>
+                        <li>Pastikan anda mengupdate data pada menu Data -{">"} Profil</li>
+                        <li>Pastikan anda menginput/mengupdate data Usaha Anda pada menu Data -{">"} Usaha</li>
+                        <li>Anda dapat merubah profil usaha anda</li>
+                    </ol>
+                </div>
+            </Col>
+        <Container className="my-5">
             <Row className="justify-content-md-center">
                 <Col md={10}>
                     <Card>
@@ -467,6 +489,8 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
                 </Col>
             </Row>
         </Container>
+    </Row>
+ </Container>
     );
 }
 
