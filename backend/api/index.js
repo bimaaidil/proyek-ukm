@@ -25,9 +25,8 @@ const corsOptions = {
     optionsSuccessStatus: 200
 };
 
-// PENTING: Terapkan middleware dari urutan paling umum ke spesifik
 app.use(cors(corsOptions));
-app.use(express.json()); // Middleware untuk membaca body JSON dari request
+app.use(express.json());
 
 // Konfigurasi Multer untuk Vercel (upload ke memori)
 const storage = multer.memoryStorage();
@@ -89,7 +88,7 @@ app.post('/api/register',
     ]),
     async (req, res) => {
         try {
-            const { name, nik, email, password } = req.body;
+            const { name, nik, email, password, alamat } = req.body; // <-- Membaca 'alamat'
             const existingUser = await prisma.user.findFirst({
                 where: { OR: [{ email }, { nik }] }
             });
@@ -112,6 +111,9 @@ app.post('/api/register',
                 fotoTempatUsahaFile ? uploadToCloudinary(fotoTempatUsahaFile.buffer) : Promise.resolve(null),
             ]);
 
+            // ==================================================
+            // === PERBAIKAN UTAMA ADA DI BLOK DI BAWAH INI ===
+            // ==================================================
             await prisma.user.create({
                 data: {
                     name: req.body.name,
@@ -128,13 +130,16 @@ app.post('/api/register',
                     kabupaten: req.body.kabupaten,
                     kecamatan: req.body.kecamatan,
                     desa: req.body.desa,
-                    alamat_lengkap: req.body.alamat_lengkap,
+                    alamat_lengkap: alamat, // <-- Menggunakan variabel 'alamat'
                     foto_ktp: fotoKtpResult?.secure_url || null,
                     ukm: {
                         create: {
                             nama_usaha: req.body.nama_usaha,
                             nama_pemilik: req.body.name,
-                            alamat: req.body.alamat_lengkap,
+                            
+                            // ✅ PERBAIKAN KUNCI: Menambahkan field 'alamat' untuk UKM
+                            alamat: alamat, 
+
                             kategori_usaha: req.body.kategori_usaha,
                             nomor_telepon: req.body.nomor_telepon,
                             modal_usaha: req.body.modal_usaha ? parseFloat(req.body.modal_usaha) : null,
@@ -195,6 +200,7 @@ app.post('/api/forgot-password', async (req, res) => {
         const user = await prisma.user.findUnique({ where: { email } });
 
         if (!user) {
+            // Selalu kirim respons sukses untuk mencegah user enumeration
             return res.status(200).json({ message: "Jika email Anda terdaftar, Anda akan menerima link reset." });
         }
 
@@ -262,6 +268,7 @@ app.post('/api/reset-password/:token', async (req, res) => {
         res.status(500).json({ message: "Terjadi kesalahan pada server." });
     }
 });
+
 
 // Rute Terproteksi
 app.get('/api/me', authenticateToken, async (req, res) => {
@@ -349,9 +356,9 @@ app.put('/api/ukm/:id', authenticateToken, upload.fields([
             
             // TODO: Tambahkan logika untuk mengunggah file baru ke Cloudinary dan menghapus file lama jika perlu.
             
-            const { name, email, nama_usaha, alamat_lengkap } = req.body;
+            const { name, email, nama_usaha, alamat } = req.body;
             // TODO: Pastikan validasi dan update data dilakukan dengan benar
-            // const ukmDataToUpdate = { nama_usaha, alamat: alamat_lengkap };
+            // const ukmDataToUpdate = { nama_usaha, alamat: alamat };
             // const userDataToUpdate = { name, email };
             
             res.status(200).json({ message: "Data berhasil diperbarui!" });
