@@ -318,13 +318,15 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
                                 <p className="fw-bold">DATA DIRI</p>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Nomor Induk Kependudukan (NIK)</Form.Label>
-                                    <Col sm={8}><Form.Control type="text" name="nik" onChange={handleChange} required />
-                                            type="text" 
-                                            name="nik" 
-                                            onChange={handleChange} 
-                                            required 
-                                            placeholder="NIK Maksimal: 16 Angka" 
-                                    </Col>
+                                   <Col sm={8}>
+                                    <Form.Control 
+                                        type="text" 
+                                        name="nik" 
+                                        onChange={handleChange} 
+                                        required 
+                                        placeholder="NIK Maksimal: 16 Angka" 
+                                    />
+                                </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Nomor Kartu Keluarga (KK)</Form.Label>
