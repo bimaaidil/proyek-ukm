@@ -47,6 +47,7 @@ function LoginPage({ setUser, showSuccessToast, showErrorToast }) {
     };
 
     return (
+        
         <Container
             className="d-flex align-items-center justify-content-center"
             style={{ minHeight: '80vh' }}

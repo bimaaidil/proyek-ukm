@@ -31,14 +31,10 @@ function WelcomePage() {
         </div>
 
         <h1>
-          DINAS PERINDUSTRIAN, <br />
-          PERDAGANGAN, KOPERASI, IKM <br />
+          SISTEM INFORMASI GEOGRAFIS, <br />
+          INDUSTRI MIKRO,KECIL,MENENGAH (IMKM) <br />
           PROVINSI RIAU
         </h1>
-
-        <div className="hashtag-bar">
-          #BANGGABUATANINDONESIA #BANGGABUATANRIAU #UMKMKIAURBANGKIT
-        </div>
 
         <p className="cta-text">
           silahkan daftarkan Usaha anda pada link dibawah ini
