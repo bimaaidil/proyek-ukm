@@ -12,6 +12,6 @@
 
 /* Menambahkan lapisan gelap agar form lebih terbaca */
 .page-background .card {
-  background-color: rgba(255, 255, 255, 0.9); /* Sedikit transparan */
+  background-color: rgba(255, 255, 255, 0.85); /* Sedikit transparan */
   backdrop-filter: blur(2px); /* Efek blur pada background di belakang card */
 }
