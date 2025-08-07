@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import './WelcomePage.css'; 
 
 // Impor komponen dari react-bootstrap untuk tata letak dan video
 import { Container, Row, Col, Card, Ratio } from 'react-bootstrap';
