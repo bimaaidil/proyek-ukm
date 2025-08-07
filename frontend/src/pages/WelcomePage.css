@@ -13,7 +13,7 @@
 /* --- PERUBAHAN UTAMA DI SINI --- */
 .welcome-container {
     position: relative; /* Diperlukan untuk lapisan overlay */
-    background-image: url('../assets/images/background-riau.jpg'); /* Ganti nama file jika perlu */
+    background-image: url('../assets/images/background.png'); /* Ganti nama file jika perlu */
     background-size: cover;
     background-position: center;
     background-attachment: fixed; /* Membuat background tetap di tempat saat scrolling */
