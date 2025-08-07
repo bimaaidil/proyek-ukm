@@ -201,6 +201,14 @@ const dataWilayah = {
     }
 };
 
+// --- (1) DATA KATEGORI BARU DITAMBAHKAN DI SINI ---
+const dataKategori = {
+  "Kuliner": ["Makanan Berat", "Makanan Ringan", "Minuman", "Bahan Mentah"],
+  "Fashion": ["Pakaian Pria", "Pakaian Wanita", "Aksesoris", "Sepatu"],
+  "Kerajinan": ["Dekorasi Rumah", "Souvenir", "Anyaman", "Ukiran"],
+  "Jasa": ["Perbaikan Elektronik", "Jasa Desain", "Fotografi", "Percetakan"]
+};
+
 // Definisikan skema validasi menggunakan Zod
 const registerSchema = z.object({
   name: z.string().min(3, "Nama harus diisi, minimal 3 karakter"),
@@ -226,9 +234,27 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
     const [kecamatanList, setKecamatanList] = useState([]);
     const [desaList, setDesaList] = useState([]);
 
+    // --- (2) STATE BARU UNTUK DROPDOWN DITAMBAHKAN DI SINI ---
+    const [kategoriList] = useState(Object.keys(dataKategori));
+    const [subKategoriList, setSubKategoriList] = useState([]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    // --- (3) FUNGSI HANDLER BARU UNTUK DROPDOWN DITAMBAHKAN DI SINI ---
+    const handleKategoriChange = (e) => {
+        const kategori = e.target.value;
+        handleChange(e); // Tetap panggil handleChange untuk simpan nilai
+        
+        if (kategori && dataKategori[kategori]) {
+            setSubKategoriList(dataKategori[kategori]);
+        } else {
+            setSubKategoriList([]);
+        }
+    // Reset pilihan sub-kategori
+        setFormData(prev => ({ ...prev, sub_kategori_produk: '' })); 
     };
 
         // Fungsi handler baru untuk checkbox
