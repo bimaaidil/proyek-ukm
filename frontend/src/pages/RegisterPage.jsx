@@ -368,7 +368,7 @@ return (
             </Col>
 
             {/* === KOLOM 2: FORM REGISTRASI === */}
-            <Col md={7} lg={8}>
+            <Col md={5} lg={6}>
                 <Card className="shadow-sm">
                     <Card.Header as="h4">Form Registrasi Pelaku & Brand Usaha</Card.Header>
                     <Card.Body>
