@@ -510,6 +510,36 @@ return (
                                         <Form.Check type="radio" name="klasifikasi" label="Menengah (2,5 Miliar - 50 Miliar/Tahun)" value="Usaha Menengah" onChange={handleChange} />
                                     </Col>
                                 </Form.Group>
+                                  {/* --- (4) BAGIAN DROPDOWN BARU DITAMBAHKAN DI SINI --- */}
+                                <hr />
+                                <p className="fw-bold">KATEGORI PRODUK USAHA</p>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm={4}>Kategori Produk</Form.Label>
+                                    <Col sm={8}>
+                                        <Form.Select name="kategori_produk" onChange={handleKategoriChange} required>
+                                            <option value="">--Pilih Kategori--</option>
+                                            {kategoriList.map(kat => (
+                                                <option key={kat} value={kat}>{kat}</option>
+                                            ))}
+                                        </Form.Select>
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm={4}>Sub Kategori Produk</Form.Label>
+                                    <Col sm={8}>
+                                        <Form.Select 
+                                            name="sub_kategori_produk" 
+                                            onChange={handleChange} 
+                                            required 
+                                            disabled={subKategoriList.length === 0}
+                                        >
+                                            <option value="">--Pilih Sub Kategori--</option>
+                                            {subKategoriList.map(subKat => (
+                                                <option key={subKat} value={subKat}>{subKat}</option>
+                                            ))}
+                                        </Form.Select>
+                                    </Col>
+                                </Form.Group>
                                 <hr />
                                 <p className="fw-bold">INFORMASI TAMBAHAN</p>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Lingkungan Lokasi Usaha</Form.Label><Col sm={8}><Form.Check type="radio" name="lingkungan_lokasi" label="Dalam Pemukiman/Perumahan" value="Pemukiman" onChange={handleChange} /><Form.Check type="radio" name="lingkungan_lokasi" label="Dalam Pasar/Pusat Perbelanjaan/Mall" value="Pusat Perbelanjaan" onChange={handleChange} /><Form.Check type="radio" name="lingkungan_lokasi" label="Dalam Ruko/Rukan" value="Ruko" onChange={handleChange} /></Col></Form.Group>
