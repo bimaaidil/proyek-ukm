@@ -1,0 +1,17 @@
+.page-background {
+  /* Ganti nama file di sini jika Anda menamainya berbeda */
+  background-image: url('../assets/images/background.png'); 
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+/* Menambahkan lapisan gelap agar form lebih terbaca */
+.page-background .card {
+  background-color: rgba(255, 255, 255, 0.9); /* Sedikit transparan */
+  backdrop-filter: blur(2px); /* Efek blur pada background di belakang card */
+}

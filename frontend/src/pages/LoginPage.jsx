@@ -2,6 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { Container, Form, Button, Card, Row, Col } from 'react-bootstrap';
+import './LoginPage.css';
 
 // Menerima 'showSuccessToast' dan 'showErrorToast' dari props App.js
 function LoginPage({ setUser, showSuccessToast, showErrorToast }) {
@@ -47,7 +48,7 @@ function LoginPage({ setUser, showSuccessToast, showErrorToast }) {
     };
 
     return (
-        
+        <div className="page-background">
         <Container
             className="d-flex align-items-center justify-content-center"
             style={{ minHeight: '80vh' }}
@@ -103,6 +104,7 @@ function LoginPage({ setUser, showSuccessToast, showErrorToast }) {
                 </Col>
             </Row>
         </Container>
+    </div>
     );
 }
 

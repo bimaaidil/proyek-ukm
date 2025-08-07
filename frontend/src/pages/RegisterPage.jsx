@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Container, Row, Col, Card } from 'react-bootstrap';
 import MapPicker from './MapPicker'; // Pastikan komponen ini ada
+import './RegisterPage.css';
 
 // Data wilayah Riau lengkap
 const dataWilayah = {
@@ -340,6 +341,7 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
     };
 
 return (
+    <div className="page-background">
     <Container className="my-5">
         <Row className="g-4 justify-content-center">
 
@@ -576,6 +578,7 @@ return (
                 </Col>
             </Row>
         </Container>
+    </div>
     );
 }
 
