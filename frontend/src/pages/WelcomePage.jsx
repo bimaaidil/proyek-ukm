@@ -7,9 +7,8 @@ import 'bootstrap/dist/css/bootstrap.min.css'; // Pastikan CSS Bootstrap diimpor
 
 // Impor semua gambar yang dibutuhkan
 import logoPemprov from '../assets/images/logo-pemprov.png';
-import logoBpkp from '../assets/images/logobpkp.png';
-import pejabat1 from '../assets/images/pejabat_1.png';
-import pejabat2 from '../assets/images/pejabat_2.png';
+import pakgub1 from '../assets/images/pakgub1.jpg';
+import wagub from '../assets/images/wagub.jpg';
 
 function WelcomePage() {
   // GANTI DENGAN ID VIDEO YOUTUBE ANDA
@@ -20,14 +19,9 @@ function WelcomePage() {
     <div className="welcome-container">
       
       <main className="content-wrapper">
-        <header className="welcome-header">
-          <img src={logoPemprov} alt="Logo Pemprov Riau" className="logo" />
-          <img src={logoBpkp} alt="Logo BPKP" className="logo" />
-        </header>
-
         <div className="official-photos">
-          <img src={pejabat1} alt="Gubernur Riau" className="official-photo" />
-          <img src={pejabat2} alt="Wakil Gubernur Riau" className="official-photo" />
+          <img src={pakgub1} alt="Gubernur Riau" className="official-photo" />
+          <img src={wagub} alt="Wakil Gubernur Riau" className="official-photo" />
         </div>
 
         <h1>
