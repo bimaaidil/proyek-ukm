@@ -19,6 +19,10 @@ function WelcomePage() {
     <div className="welcome-container">
       
       <main className="content-wrapper">
+        <header className="welcome-header">
+          <img src={logoPemprov} alt="Logo Pemprov Riau" className="logo" />
+        </header>
+
         <div className="official-photos">
           <img src={pakgub1} alt="Gubernur Riau" className="official-photo" />
           <img src={wagub} alt="Wakil Gubernur Riau" className="official-photo" />
