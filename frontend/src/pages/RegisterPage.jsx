@@ -352,7 +352,7 @@ return (
                         Selamat datang di SI-IMKM RIAU. Silakan lakukan registrasi untuk mendaftarkan Usaha anda.
                     </p>
                     <p className="small text-muted">
-                        Setelah proses registrasi berhasil, maka <strong>NIK</strong> dan <strong>Password</strong> yang anda ketikkan akan menjadi akun untuk login.
+                        Setelah proses registrasi berhasil, maka <strong>Username/Email</strong> dan <strong>Password</strong> yang anda ketikkan akan menjadi akun untuk login.
                     </p>
                     <p className="small text-muted">
                         Tahapan yang harus dilakukan setelah berhasil login, sebagai berikut:
