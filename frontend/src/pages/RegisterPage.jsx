@@ -355,6 +355,22 @@ return (
                                 <hr />
                                 <p className="fw-bold">DATA DIRI</p>
                                 <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm={4}>Nama Pelaku Usaha (sesuai KTP)</Form.Label>
+                                    <Col sm={8}><Form.Control type="text" name="name" onChange={handleChange} required /></Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm={4}>Tempat & Tanggal Lahir</Form.Label>
+                                    <Col sm={5}><Form.Control type="text" name="tempat_lahir" placeholder="Tempat Lahir" onChange={handleChange} required /></Col>
+                                    <Col sm={3}><Form.Control type="date" name="tanggal_lahir" onChange={handleChange} required /></Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm={4}>Jenis Kelamin</Form.Label>
+                                    <Col sm={8}>
+                                        <Form.Check inline type="radio" label="Laki-laki" name="jenis_kelamin" value="Laki-laki" onChange={handleChange} />
+                                        <Form.Check inline type="radio" label="Perempuan" name="jenis_kelamin" value="Perempuan" onChange={handleChange} />
+                                    </Col>
+                                </Form.Group>
+                                <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Nomor Induk Kependudukan (NIK)</Form.Label>
                                    <Col sm={8}>
                                     <Form.Control 
@@ -379,24 +395,8 @@ return (
                                 </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm={4}>Nama Pelaku Usaha (sesuai KTP)</Form.Label>
-                                    <Col sm={8}><Form.Control type="text" name="name" onChange={handleChange} required /></Col>
-                                </Form.Group>
-                                <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm={4}>Tempat & Tanggal Lahir</Form.Label>
-                                    <Col sm={5}><Form.Control type="text" name="tempat_lahir" placeholder="Tempat Lahir" onChange={handleChange} required /></Col>
-                                    <Col sm={3}><Form.Control type="date" name="tanggal_lahir" onChange={handleChange} required /></Col>
-                                </Form.Group>
-                                <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>NPWP</Form.Label>
                                     <Col sm={8}><Form.Control type="text" name="npwp" onChange={handleChange} /></Col>
-                                </Form.Group>
-                                <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm={4}>Jenis Kelamin</Form.Label>
-                                    <Col sm={8}>
-                                        <Form.Check inline type="radio" label="Laki-laki" name="jenis_kelamin" value="Laki-laki" onChange={handleChange} />
-                                        <Form.Check inline type="radio" label="Perempuan" name="jenis_kelamin" value="Perempuan" onChange={handleChange} />
-                                    </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Foto KTP</Form.Label>
@@ -454,9 +454,9 @@ return (
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Nomor Izin Berusaha (NIB)</Form.Label><Col sm={8}><Form.Control type="text" name="nomor_nib" onChange={handleChange} /></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Tanggal Terbit NIB</Form.Label><Col sm={8}><Form.Control type="date" name="tanggal_nib" onChange={handleChange} /></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Upload File NIB/SKDU</Form.Label><Col sm={8}><Form.Control type="file" name="file_nib" onChange={handleFileChange} /><Form.Text className="text-muted">Ukuran file maksimal: 2 MB</Form.Text></Col></Form.Group>
-                                <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Kondisi Usaha</Form.Label><Col sm={8}><Form.Check inline type="radio" name="kondisi_usaha" value="Masih Berjalan" onChange={handleChange} /><Form.Check inline type="radio" name="kondisi_usaha" value="Sudah Tutup" onChange={handleChange} /></Col></Form.Group>
+                                <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Kondisi Usaha</Form.Label><Col sm={8}><Form.Check inline type="radio" label="Masih Berjalan" name="kondisi_usaha" value="Masih Berjalan" onChange={handleChange} /><Form.Check inline type="radio" label="Sudah Tutup" name="kondisi_usaha" value="Sudah Tutup" onChange={handleChange} /></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm={4}>Nomor Telepon/HP Usaha</Form.Label>
+                                    <Form.Label column sm={4}>Nomor HP/Whatsapp</Form.Label>
                                     <Col sm={8}><Form.Control type="text" name="nomor_telepon" onChange={handleChange} required /></Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
@@ -508,7 +508,7 @@ return (
                                 </Form.Group>
                                 <hr />
                                 <hr />
-                                <p className="fw-bold">DATA AKUN & KONTAK</p>
+                                <p className="fw-bold">DATA AKUN</p>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Alamat Email</Form.Label><Col sm={8}><Form.Control type="email" name="email" onChange={handleChange} required /></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Password</Form.Label><Col sm={8}><Form.Control type="password" name="password" onChange={handleChange} required /></Col></Form.Group>
                                 <div className="d-grid mt-4">
