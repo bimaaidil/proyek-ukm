@@ -221,6 +221,7 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
     const [files, setFiles] = useState({});
     const navigate = useNavigate();
 
+    const [mediaPemasaran, setMediaPemasaran] = useState([]);
     const [kabupatenList] = useState(Object.keys(dataWilayah));
     const [kecamatanList, setKecamatanList] = useState([]);
     const [desaList, setDesaList] = useState([]);
@@ -228,6 +229,16 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+        // Fungsi handler baru untuk checkbox
+    const handleCheckboxChange = (e) => {
+        const { value, checked } = e.target;
+        if (checked) {
+            setMediaPemasaran(prev => [...prev, value]);
+        } else {
+            setMediaPemasaran(prev => prev.filter(item => item !== value));
+        }
     };
 
     const handleLocationSelect = (coords) => {
@@ -277,6 +288,9 @@ function RegisterPage({ showSuccessToast, showErrorToast }) {
             if (files[key]) {
                 data.append(key, files[key]);
             }
+        }
+            if (mediaPemasaran.length > 0) {
+                data.append('media_pemasaran', mediaPemasaran.join(', '));
         }
 
         console.log("Data yang akan dikirim ke backend:", Object.fromEntries(data.entries()));
@@ -475,13 +489,28 @@ return (
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Lingkungan Lokasi Usaha</Form.Label><Col sm={8}><Form.Check type="radio" name="lingkungan_lokasi" label="Dalam Pemukiman/Perumahan" value="Pemukiman" onChange={handleChange} /><Form.Check type="radio" name="lingkungan_lokasi" label="Dalam Pasar/Pusat Perbelanjaan/Mall" value="Pusat Perbelanjaan" onChange={handleChange} /><Form.Check type="radio" name="lingkungan_lokasi" label="Dalam Ruko/Rukan" value="Ruko" onChange={handleChange} /></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Foto Pemilik Usaha</Form.Label><Col sm={8}><Form.Control type="file" name="foto_pemilik" onChange={handleFileChange} /><Form.Text className="text-muted">Ukuran file maksimal: 2 MB</Form.Text></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Foto Tempat Usaha</Form.Label><Col sm={8}><Form.Control type="file" name="foto_tempat_usaha" onChange={handleFileChange} /><Form.Text className="text-muted">Ukuran file maksimal: 2 MB</Form.Text></Col></Form.Group>
+                                {/* --- BAGIAN CHECKBOX BARU --- */}
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm={4}>
+                                        Media Pemasaran Online
+                                        <br />
+                                        <small className="text-muted">(Boleh pilih lebih dari satu)</small>
+                                    </Form.Label>
+                                    <Col sm={8}>
+                                        <Form.Check type="checkbox" label="Lazada" value="Lazada" onChange={handleCheckboxChange} />
+                                        <Form.Check type="checkbox" label="Shopee" value="Shopee" onChange={handleCheckboxChange} />
+                                        <Form.Check type="checkbox" label="Tokopedia" value="Tokopedia" onChange={handleCheckboxChange} />
+                                        <Form.Check type="checkbox" label="Facebook" value="Facebook" onChange={handleCheckboxChange} />
+                                        <Form.Check type="checkbox" label="Instagram" value="Instagram" onChange={handleCheckboxChange} />
+                                        <Form.Check type="checkbox" label="Website Sendiri" value="Website Sendiri" onChange={handleCheckboxChange} />
+                                        <Form.Check type="checkbox" label="Lainnya" value="Lainnya" onChange={handleCheckboxChange} />
+                                    </Col>
+                                </Form.Group>
+                                <hr />
                                 <hr />
                                 <p className="fw-bold">DATA AKUN & KONTAK</p>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Alamat Email</Form.Label><Col sm={8}><Form.Control type="email" name="email" onChange={handleChange} required /></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Password</Form.Label><Col sm={8}><Form.Control type="password" name="password" onChange={handleChange} required /></Col></Form.Group>
-                                <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Alamat Website</Form.Label><Col sm={8}><Form.Control type="text" name="website" onChange={handleChange} /></Col></Form.Group>
-                                <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Akun Twitter</Form.Label><Col sm={8}><Form.Control type="text" name="twitter" onChange={handleChange} /></Col></Form.Group>
-                                <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Akun Instagram</Form.Label><Col sm={8}><Form.Control type="text" name="instagram" onChange={handleChange} /></Col></Form.Group>
                                 <div className="d-grid mt-4">
                                     <Button variant="primary" type="submit">Kirim Data</Button>
                                 </div>
