@@ -49,46 +49,6 @@ function WelcomePage() {
         </div>
       </main>
 
-      {/* Bagian Video Kegiatan (Menggunakan react-bootstrap) */}
-      <Container className="my-5">
-          <Row className="justify-content-center text-center mb-4">
-              <Col md={10}>
-                  <h2 className="fw-bold">Video Kegiatan & Profil</h2>
-                  <p className="text-muted">Lihat lebih dekat bagaimana kami mendukung pertumbuhan IMKM di Riau.</p>
-              </Col>
-          </Row>
-          <Row className="g-4 justify-content-center">
-              {/* Video Pertama */}
-              <Col md={6} lg={5}>
-                  <Card className="shadow-lg border-0">
-                      <Ratio aspectRatio="16x9">
-                          <iframe
-                              src={`https://www.youtube.com/embed/${youtubeVideoId1}`}
-                              title="Video Kegiatan 1"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                              style={{ border: 0, borderRadius: '0.5rem' }}
-                          ></iframe>
-                      </Ratio>
-                  </Card>
-              </Col>
-              {/* Video Kedua */}
-              <Col md={6} lg={5}>
-                  <Card className="shadow-lg border-0">
-                      <Ratio aspectRatio="16x9">
-                          <iframe
-                              src={`https://www.youtube.com/embed/${youtubeVideoId2}`}
-                              title="Video Kegiatan 2"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                              style={{ border: 0, borderRadius: '0.5rem' }}
-                          ></iframe>
-                      </Ratio>
-                  </Card>
-              </Col>
-          </Row>
-      </Container>
-
       <a href="/hubungi-kami" className="contact-link">Hubungi Kami</a>
     </div>
   );
