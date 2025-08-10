@@ -423,8 +423,16 @@ return (
                                 </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm={4}>NPWP</Form.Label>
-                                    <Col sm={8}><Form.Control type="text" name="npwp" onChange={handleChange} /></Col>
+                                    <Form.Label column sm={4}>npwp</Form.Label>
+                                    <Col sm={8}>
+                                    <Form.Control 
+                                        type="text" 
+                                        name="npwp"
+                                        onChange={handleChange} 
+                                        required 
+                                        placeholder="Npwp Max: 16 angka"
+                                    />
+                                </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
                                     <Form.Label column sm={4}>Foto KTP</Form.Label>
