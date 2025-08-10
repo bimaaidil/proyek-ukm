@@ -13,8 +13,7 @@ import wagub from '../assets/images/wagub.jpg';
 
 function WelcomePage() {
   // GANTI DENGAN ID VIDEO YOUTUBE ANDA
-  const youtubeVideoId1 = 'XbRaiO2SmFk'; // Contoh Video 1: Pariwisata Riau
-  const youtubeVideoId2 = 'p70Zi64wyqg'; // PERBAIKAN: ID video dari Anda
+  const youtubeVideoId1 = 'OqE75g6DHs4'; // Contoh Video 1: Pariwisata Riau
 
   return (
     <div className="welcome-container">
@@ -48,6 +47,32 @@ function WelcomePage() {
           </Link>
         </div>
       </main>
+
+      {/* Bagian Video Kegiatan (Menggunakan react-bootstrap) */}
+      <Container className="my-5">
+          <Row className="justify-content-center text-center mb-4">
+              <Col md={10}>
+                  <h2 className="fw-bold">Video Penjelasan Aplikasi</h2>
+                  <p className="text-muted">Aplikasi dibuat untuk menyelesaikan tugas Kerja Praktek.</p>
+              </Col>
+          </Row>
+          <Row className="g-4 justify-content-center">
+              {/* Video Pertama */}
+              <Col md={6} lg={5}>
+                  <Card className="shadow-lg border-0">
+                      <Ratio aspectRatio="16x9">
+                          <iframe
+                              src={`https://youtu.be/OqE75g6DHs4`}
+                              title="Video aplikasi"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              style={{ border: 0, borderRadius: '0.5rem' }}
+                          ></iframe>
+                      </Ratio>
+                  </Card>
+              </Col>
+          </Row>
+      </Container>
 
       <a href="/hubungi-kami" className="contact-link">Hubungi Kami</a>
     </div>
