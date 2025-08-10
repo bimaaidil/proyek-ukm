@@ -62,7 +62,7 @@ function WelcomePage() {
                   <Card className="shadow-lg border-0">
                       <Ratio aspectRatio="16x9">
                           <iframe
-                              src={`https://youtu.be/OqE75g6DHs4`}
+                              src={`https://www.youtube.com/embed/${youtubeVideoId1}`}
                               title="Video aplikasi"
                               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                               allowFullScreen
