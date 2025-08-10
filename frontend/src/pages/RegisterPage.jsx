@@ -423,7 +423,7 @@ return (
                                 </Col>
                                 </Form.Group>
                                 <Form.Group as={Row} className="mb-3">
-                                    <Form.Label column sm={4}>npwp</Form.Label>
+                                    <Form.Label column sm={4}>Npwp</Form.Label>
                                     <Col sm={8}>
                                     <Form.Control 
                                         type="text" 
@@ -487,7 +487,18 @@ return (
                                 <p className="fw-bold">DATA BRAND USAHA</p>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Nama atau Brand Usaha</Form.Label><Col sm={8}><Form.Control type="text" name="nama_usaha" onChange={handleChange} required /></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Tahun Berdiri</Form.Label><Col sm={8}><Form.Control type="number" name="tahun_berdiri" onChange={handleChange} /></Col></Form.Group>
-                                <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Nomor Izin Berusaha (NIB)</Form.Label><Col sm={8}><Form.Control type="text" name="nomor_nib" onChange={handleChange} /></Col></Form.Group>
+                                <Form.Group as={Row} className="mb-3">
+                                    <Form.Label column sm={4}>Nib</Form.Label>
+                                    <Col sm={8}>
+                                    <Form.Control 
+                                        type="text" 
+                                        name="Nib"
+                                        onChange={handleChange} 
+                                        required 
+                                        placeholder="Nib Max: 13 angka"
+                                    />
+                                </Col>
+                                </Form.Group>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Tanggal Terbit NIB</Form.Label><Col sm={8}><Form.Control type="date" name="tanggal_nib" onChange={handleChange} /></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Upload File NIB/SKDU</Form.Label><Col sm={8}><Form.Control type="file" name="file_nib" onChange={handleFileChange} /><Form.Text className="text-muted">Ukuran file maksimal: 2 MB</Form.Text></Col></Form.Group>
                                 <Form.Group as={Row} className="mb-3"><Form.Label column sm={4}>Kondisi Usaha</Form.Label><Col sm={8}><Form.Check inline type="radio" label="Masih Berjalan" name="kondisi_usaha" value="Masih Berjalan" onChange={handleChange} /><Form.Check inline type="radio" label="Sudah Tutup" name="kondisi_usaha" value="Sudah Tutup" onChange={handleChange} /></Col></Form.Group>
